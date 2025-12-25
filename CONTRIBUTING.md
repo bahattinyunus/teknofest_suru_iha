@@ -1,23 +1,23 @@
-# Contributing to Swarm-Architect
+# Katkıda Bulunma Rehberi
 
-First off, thank you for considering contributing to Swarm-Architect! It's people like you that make swarm intelligence systems more robust.
+Swarm-Architect projesine katkıda bulunmayı düşündüğünüz için teşekkür ederiz! Sürü zekası sistemlerini daha sağlam hale getiren sizlersiniz.
 
-## How Can I Contribute?
+## Nasıl Katkıda Bulunabilirim?
 
-### Reporting Bugs
-- Use a clear and descriptive title for the issue.
-- Describe the exact steps which reproduce the problem.
-- Explain which behavior you expected to see and why.
+### Hata Bildirimi (Bug Reporting)
+- Sorun için açık ve açıklayıcı bir başlık kullanın.
+- Sorunu yeniden oluşturmak için gereken adımları tam olarak açıklayın.
+- Hangi davranışı görmeyi beklediğinizi ve nedenini açıklayın.
 
-### Suggesting Enhancements
-- Explain the behavior you would like to see and why.
-- Provide specific examples to demonstrate the steps.
+### Geliştirme Önerileri
+- Görmek istediğiniz davranışı ve nedenini açıklayın.
+- Adımları göstermek için belirli örnekler verin.
 
-### Pull Requests
-1. Fork the repo and create your branch from `main`.
-2. Ensure your code follows the existing style.
-3. Update the README.md with details of changes to the interface, if applicable.
-4. Submit your PR with a comprehensive description of changes.
+### Pull Request (Değişiklik İsteği)
+1. Repoyu fork'layın ve `main` dalından kendi branch'inizi oluşturun.
+2. Kodunuzun mevcut stile uyduğundan emin olun.
+3. Varsa, arayüz değişikliklerinin ayrıntılarıyla README.md dosyasını güncelleyin.
+4. Değişikliklerin kapsamlı bir açıklamasıyla PR'ınızı gönderin.
 
-## License
-By contributing, you agree that your contributions will be licensed under its MIT License.
+## Lisans
+Katkıda bulunarak, katkılarınızın MIT Lisansı altında lisanslanacağını kabul etmiş olursunuz.

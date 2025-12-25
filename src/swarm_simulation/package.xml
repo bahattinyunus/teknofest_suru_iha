@@ -3,7 +3,7 @@
 <package format="3">
   <name>swarm_simulation</name>
   <version>0.1.0</version>
-  <description>Gazebo simulation worlds and launch files for Swarm-Architect.</description>
+  <description>Swarm-Architect için Gazebo simülasyon dünyaları ve başlatma dosyaları.</description>
   <maintainer email="bahattinyunus@example.com">Bahattin Yunus Çetin</maintainer>
   <license>MIT</license>
 

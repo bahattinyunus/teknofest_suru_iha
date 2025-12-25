@@ -3,7 +3,7 @@
 <package format="3">
   <name>swarm_core</name>
   <version>0.1.0</version>
-  <description>The brain of the swarm: Distributed logic and control nodes.</description>
+  <description>Sürünün beyni: Dağıtık mantık ve kontrol düğümleri.</description>
   <maintainer email="bahattinyunus@example.com">Bahattin Yunus Çetin</maintainer>
   <license>MIT</license>
 

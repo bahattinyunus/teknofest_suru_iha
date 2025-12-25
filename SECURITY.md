@@ -1,21 +1,21 @@
-# Security Policy
+# Güvenlik Politikası
 
-## Supported Versions
+## Desteklenen Sürümler
 
-The following versions of the project are currently being supported with security updates.
+Aşağıdaki proje sürümleri şu anda güvenlik güncellemeleriyle desteklenmektedir.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Sürüm | Destek Durumu      |
+| ----- | ------------------ |
+| 1.0.x | :white_check_mark: |
+| < 1.0 | :x:                |
 
-## Reporting a Vulnerability
+## Güvenlik Açığı Bildirimi
 
-We take security seriously. If you discover a vulnerability, please do NOT open a public issue. Instead, follow these steps:
+Güvenliği ciddiye alıyoruz. Bir güvenlik açığı keşfederseniz, lütfen herkese açık bir issue AÇMAYIN. Bunun yerine şu adımları izleyin:
 
-1. **Email the Maintainer:** Send an email to the project lead (Bahattin Yunus Çetin).
-2. **Details:** Provide a detailed description of the vulnerability, including how to reproduce it and its potential impact.
-3. **Acknowledgment:** We will acknowledge your report within 48 hours and provide a timeline for a fix.
-4. **Disclosure:** Once the fix is deployed, we will coordinate public disclosure if necessary.
+1.  **Bakımcıya E-posta Gönderin:** Proje liderine (Bahattin Yunus Çetin) bir e-posta gönderin.
+2.  **Detaylar:** Güvenlik açığının ayrıntılı bir açıklamasını, nasıl yeniden oluşturulacağını ve potansiyel etkisini sağlayın.
+3.  **Onay:** Bildiriminizi 48 saat içinde onaylayacağız ve bir düzeltme takvimi sağlayacağız.
+4.  **İfşa:** Düzeltme yayınlandıktan sonra, gerekirse kamuya açık ifşayı koordine edeceğiz.
 
-Thank you for helping keep the autonomous systems community safe.
+Otonom sistemler topluluğunu güvende tutmaya yardımcı olduğunuz için teşekkür ederiz.

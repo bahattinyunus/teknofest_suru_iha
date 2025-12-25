@@ -7,13 +7,13 @@ from mavros_msgs.msg import State
 class SwarmCommander(Node):
     def __init__(self):
         super().__init__('swarm_commander')
-        self.get_logger().info('Swarm Commander Initialized awaiting orders...')
+        self.get_logger().info('Sürü Komutanı Başlatıldı, emirler bekleniyor...')
         
-        # Load parameters
+        # Parametreleri yükle
         self.declare_parameter('swarm_id', 1)
         self.swarm_id = self.get_parameter('swarm_id').value
         
-        # Subscribers
+        # Abonelikler (Subscribers)
         self.state_sub = self.create_subscription(
             State,
             f'mavros/state',

@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     maintainer='Bahattin Yunus Çetin',
     maintainer_email='bahattinyunus@example.com',
-    description='Gazebo simulation worlds and launch files for Swarm-Architect.',
+    description='Swarm-Architect için Gazebo simülasyon dünyaları ve başlatma dosyaları.',
     license='MIT',
     tests_require=['pytest'],
     entry_points={

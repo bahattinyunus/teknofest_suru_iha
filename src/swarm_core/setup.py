@@ -18,7 +18,7 @@ setup(
     zip_safe=True,
     maintainer='Bahattin Yunus Çetin',
     maintainer_email='bahattinyunus@example.com',
-    description='The brain of the swarm: Distributed logic and control nodes.',
+    description='Sürünün beyni: Dağıtık mantık ve kontrol düğümleri.',
     license='MIT',
     tests_require=['pytest'],
     entry_points={

@@ -1,23 +1,23 @@
-name: Bug report
-description: Create a report to help us improve
-labels: ["bug"]
+name: Hata Bildirimi (Bug Report)
+description: Geliştirmemize yardımcı olmak için bir rapor oluşturun
+labels: ["hata", "bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Bu hata raporunu doldurmak için zaman ayırdığınız için teşekkürler!
   - type: textarea
     id: what-happened
     attributes:
-      label: What happened?
-      description: Also tell us what you expected to happen
-      placeholder: Tell us what you see!
+      label: Ne oldu?
+      description: Ayrıca ne olmasını beklediğinizi de söyleyin
+      placeholder: Bize ne gördüğünüzü anlatın!
     validations:
       required: true
   - type: dropdown
     id: version
     attributes:
-      label: Which version of the swarm software are you using?
+      label: Süre yazılımının hangi sürümünü kullanıyorsunuz?
       options:
         - v1.0.0
         - main
@@ -26,6 +26,6 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      label: İlgili log çıktıları
+      description: Lütfen ilgili log çıktılarını kopyalayıp yapıştırın. Bu otomatik olarak kod formatına dönüştürülecektir.
       render: shell
