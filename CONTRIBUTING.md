@@ -1,23 +1,25 @@
-# Katkıda Bulunma Rehberi
+# 🤝 Contributing to the Swarm
 
-Swarm-Architect projesine katkıda bulunmayı düşündüğünüz için teşekkür ederiz! Sürü zekası sistemlerini daha sağlam hale getiren sizlersiniz.
+**"Efficiency through Unity."**
 
-## Nasıl Katkıda Bulunabilirim?
+Welcome to the **Teknofest Swarm UAV** project. We value every contribution that helps the Swarm fly smarter, faster, and more synchronously. This document outlines the protocols for contributing to the Hive.
 
-### Hata Bildirimi (Bug Reporting)
-- Sorun için açık ve açıklayıcı bir başlık kullanın.
-- Sorunu yeniden oluşturmak için gereken adımları tam olarak açıklayın.
-- Hangi davranışı görmeyi beklediğinizi ve nedenini açıklayın.
+## 🛠️ Protocols
+1.  **Fork the Hive**: Create your own instance of the repository.
+2.  **Create a Branch**: `git checkout -b feature/AdvancedFormation`
+3.  **Commit Changes**: `git commit -m 'Add V-Shape formation logic'`
+4.  **Push to Branch**: `git push origin feature/AdvancedFormation`
+5.  **Open a Pull Request**: Submit your code for review by the Swarm Architects.
 
-### Geliştirme Önerileri
-- Görmek istediğiniz davranışı ve nedenini açıklayın.
-- Adımları göstermek için belirli örnekler verin.
+## ⚠️ Coding Standards
+- **Python**: Follow PEP 8 guidelines.
+- **ROS 2**: Adhere to ROS 2 Design Patterns.
+- **Documentation**: Comment all complex logic. "Silent code is dead code."
 
-### Pull Request (Değişiklik İsteği)
-1. Repoyu fork'layın ve `main` dalından kendi branch'inizi oluşturun.
-2. Kodunuzun mevcut stile uyduğundan emin olun.
-3. Varsa, arayüz değişikliklerinin ayrıntılarıyla README.md dosyasını güncelleyin.
-4. Değişikliklerin kapsamlı bir açıklamasıyla PR'ınızı gönderin.
+## 🐞 Bug Reporting
+If you detect a glitch in the matrix (bug), please open an issue with the label `bug`. Include:
+- Description of the anomaly.
+- Steps to reproduce.
+- Flight logs or error stacks.
 
-## Lisans
-Katkıda bulunarak, katkılarınızın MIT Lisansı altında lisanslanacağını kabul etmiş olursunuz.
+Together, we will dominate the skies.
