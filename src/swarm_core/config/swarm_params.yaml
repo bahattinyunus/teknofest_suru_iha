@@ -1,0 +1,6 @@
+swarm_settings:
+  ros__parameters:
+    formation_type: "V-shape"
+    min_separation: 2.5 # meters
+    max_velocity: 15.0 # m/s
+    leader_id: 1

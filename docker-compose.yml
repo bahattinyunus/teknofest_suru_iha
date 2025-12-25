@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  swarm-command:
+    build: .
+    volumes:
+      - ./src:/ws/src
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    network_mode: host
+    command: ros2 run swarm_core commander
