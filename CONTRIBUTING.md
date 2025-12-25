@@ -1,25 +1,25 @@
-# 🤝 Contributing to the Swarm
+# 🤝 Sürüye Katkıda Bulunma
 
-**"Efficiency through Unity."**
+**"Birlik Yoluyla Verimlilik."**
 
-Welcome to the **Teknofest Swarm UAV** project. We value every contribution that helps the Swarm fly smarter, faster, and more synchronously. This document outlines the protocols for contributing to the Hive.
+**Teknofest Sürü İHA** projesine hoş geldiniz. Sürünün daha akıllı, daha hızlı ve daha senkronize uçmasına yardımcı olan her katkıya değer veriyoruz. Bu belge, Kovana katkıda bulunma protokollerini özetlemektedir.
 
-## 🛠️ Protocols
-1.  **Fork the Hive**: Create your own instance of the repository.
-2.  **Create a Branch**: `git checkout -b feature/AdvancedFormation`
-3.  **Commit Changes**: `git commit -m 'Add V-Shape formation logic'`
-4.  **Push to Branch**: `git push origin feature/AdvancedFormation`
-5.  **Open a Pull Request**: Submit your code for review by the Swarm Architects.
+## 🛠️ Protokoller
+1.  **Kovanı Çatallayın (Fork)**: Deponun kendi örneğini oluşturun.
+2.  **Bir Dal (Branch) Oluşturun**: `git checkout -b ozellik/GelismisFormasyon`
+3.  **Değişiklikleri İşleyin (Commit)**: `git commit -m 'V-Şekli formasyon mantığı eklendi'`
+4.  **Dala Gönderin (Push)**: `git push origin ozellik/GelismisFormasyon`
+5.  **Bir Çekme İsteği (Pull Request) Açın**: Kodunuzu Sürü Mimarları tarafından incelenmek üzere gönderin.
 
-## ⚠️ Coding Standards
-- **Python**: Follow PEP 8 guidelines.
-- **ROS 2**: Adhere to ROS 2 Design Patterns.
-- **Documentation**: Comment all complex logic. "Silent code is dead code."
+## ⚠️ Kodlama Standartları
+- **Python**: PEP 8 yönergelerini izleyin.
+- **ROS 2**: ROS 2 Tasarım Kalıplarına uyun.
+- **Dokümantasyon**: Tüm karmaşık mantıkları yorumlayın. "Sessiz kod ölü koddur."
 
-## 🐞 Bug Reporting
-If you detect a glitch in the matrix (bug), please open an issue with the label `bug`. Include:
-- Description of the anomaly.
-- Steps to reproduce.
-- Flight logs or error stacks.
+## 🐞 Hata Bildirimi
+Matriste bir aksaklık (hata) tespit ederseniz, lütfen `hata` (bug) etiketiyle bir sorun (issue) açın. Şunları ekleyin:
+- Anormalliğin tanımı.
+- Yeniden oluşturma adımları.
+- Uçuş günlükleri veya hata yığınları.
 
-Together, we will dominate the skies.
+Birlikte gökyüzüne hükmedeceğiz.

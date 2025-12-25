@@ -1,17 +1,17 @@
-# 📜 Code of Conduct
+# 📜 Davranış Kuralları
 
-## Our Pledge
-In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to make participation in our project and our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
+## Taahhüdümüz
+Açık ve misafirperver bir ortam geliştirme adına, katkıda bulunanlar ve yöneticiler olarak bizler; yaş, vücut ölçüsü, engellilik, etnik köken, cinsiyet kimliği ve ifadesi, deneyim düzeyi, milliyet, kişisel görünüm, ırk, din veya cinsel kimlik ve yönelimden bağımsız olarak projemize ve topluluğumuza katılımı herkes için tacizden arındırılmış bir deneyim haline getirmeyi taahhüt ediyoruz.
 
-## Our Standards
-Examples of behavior that contributes to a positive environment include:
-*   Using welcoming and inclusive language.
-*   Being respectful of differing viewpoints and experiences.
-*   Gracefully accepting constructive criticism.
-*   Focusing on what is best for the community.
-*   Showing empathy towards other community members.
+## Standartlarımız
+Olumlu bir ortama katkıda bulunan davranış örnekleri şunlardır:
+*   Misafirperver ve kapsayıcı dil kullanımı.
+*   Farklı görüşlere ve deneyimlere saygı duyulması.
+*   Yapıcı eleştirilerin incelikle kabul edilmesi.
+*   Topluluk için en iyi olana odaklanılması.
+*   Diğer topluluk üyelerine karşı empati gösterilmesi.
 
-## Enforcement
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
+## Yaptırım
+İstismarcı, taciz edici veya başka bir şekilde kabul edilemez davranış örnekleri, proje ekibiyle iletişime geçilerek bildirilebilir. Tüm şikayetler incelenecek ve araştırılacak ve duruma göre gerekli ve uygun görülen bir yanıtla sonuçlanacaktır.
 
-**Teknofest Swarm UAV Team**
+**Teknofest Sürü İHA Takımı**
