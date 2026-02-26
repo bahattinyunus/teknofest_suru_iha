@@ -3,7 +3,7 @@
 # 🚁 TEKNOFEST SÜRÜ ZEKASI KOMUTA MERKEZİ
 ### Sürü İHA (Swarm UAV) Yarışması 2025
 
-![Sürü Komuta Merkezi](swarm_command_center_header.png)
+![Sürü Komuta Merkezi](visionary_swarm_banner.png)
 
 [![Lisans](https://img.shields.io/badge/LISANS-MIT-00E5FF?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Durum](https://img.shields.io/badge/SISTEM-OPERASYONEL-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://github.com/bahattinyunus/teknofest_suru_iha)
