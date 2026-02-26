@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'commander = swarm_core.node_commander:main',
+            'dashboard = swarm_core.dashboard:main',
         ],
     },
 )

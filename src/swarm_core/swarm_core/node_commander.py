@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Twist
 from mavros_msgs.msg import State
+from sensor_msgs.msg import LaserScan
 import math
 
 class SwarmCommander(Node):
@@ -15,6 +16,8 @@ class SwarmCommander(Node):
         self.declare_parameter('cohesion_weight', 1.0)
         self.declare_parameter('alignment_weight', 1.0)
         self.declare_parameter('separation_weight', 1.6)
+        self.declare_parameter('obstacle_weight', 2.5)
+        self.declare_parameter('safe_distance', 3.0)
         self.declare_parameter('max_speed', 5.0)
         self.declare_parameter('perception_radius', 15.0)
         
@@ -50,7 +53,16 @@ class SwarmCommander(Node):
             10
         )
         
+        # Engel/Çarpışma uyarılarını dinleme (Lidar simülasyonu)
+        self.scan_sub = self.create_subscription(
+            LaserScan,
+            'scan',
+            self.scan_cb,
+            10
+        )
+        
         self.current_state = State()
+        self.latest_scan = None
         self.neighbors = {} # id -> pose map
         self.current_pose = PoseStamped()
         
@@ -59,6 +71,29 @@ class SwarmCommander(Node):
         
     def state_cb(self, msg):
         self.current_state = msg
+
+    def scan_cb(self, msg):
+        self.latest_scan = msg
+
+    def calculate_obstacle_repulsion(self):
+        """Lidar/Mesafe sensöründen gelen engellerden kaçış vektörü"""
+        force = [0.0, 0.0]
+        if not self.latest_scan:
+            return force
+            
+        safe_dist = self.get_parameter('safe_distance').value
+        obs_weight = self.get_parameter('obstacle_weight').value
+        
+        angle = self.latest_scan.angle_min
+        for r in self.latest_scan.ranges:
+            if self.latest_scan.range_min < r < safe_dist:
+                # İtici kuvvet, mesafenin tersi ile orantılı
+                magnitude = (safe_dist - r) / safe_dist * obs_weight
+                force[0] -= magnitude * math.cos(angle)
+                force[1] -= magnitude * math.sin(angle)
+            angle += self.latest_scan.angle_increment
+            
+        return force
 
     def pose_cb(self, msg):
         # Gerçekte frame_id veya drone ID üzerinden ayrım yapılır
@@ -108,6 +143,11 @@ class SwarmCommander(Node):
             # Sürü rotası birleşimi
             cmd_vel.linear.x = cohesion[0] + separation[0]
             cmd_vel.linear.y = cohesion[1] + separation[1]
+            
+            # --- Faz 3: Engelden Kaçınma Eklentisi ---
+            obs_force = self.calculate_obstacle_repulsion()
+            cmd_vel.linear.x += obs_force[0]
+            cmd_vel.linear.y += obs_force[1]
             
             # Hız sınırlandırma (Max Speed clamp)
             max_speed = self.get_parameter('max_speed').value
