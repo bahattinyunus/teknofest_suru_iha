@@ -8,6 +8,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 def generate_launch_description():
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
     pkg_swarm_sim = get_package_share_directory('swarm_simulation')
+    pkg_swarm_core = get_package_share_directory('swarm_core')
 
     # Gazebo launch
     gazebo = IncludeLaunchDescription(
@@ -16,6 +17,14 @@ def generate_launch_description():
         )
     )
 
+    # Swarm Logic Launch
+    swarm_logic = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_swarm_core, 'launch', 'swarm.launch.py'),
+        )
+    )
+
     return LaunchDescription([
-        gazebo
+        gazebo,
+        swarm_logic
     ])
