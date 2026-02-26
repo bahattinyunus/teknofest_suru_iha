@@ -1,30 +1,131 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Twist
 from mavros_msgs.msg import State
+import math
 
 class SwarmCommander(Node):
     def __init__(self):
         super().__init__('swarm_commander')
-        self.get_logger().info('Sürü Komutanı Başlatıldı, emirler bekleniyor...')
+        self.get_logger().info('Sürü Komutanı Başlatıldı, Boids (Sürü) Algoritması aktif...')
         
-        # Parametreleri yükle
+        # Sürü parametreleri (Boids algoritması için)
         self.declare_parameter('swarm_id', 1)
+        self.declare_parameter('cohesion_weight', 1.0)
+        self.declare_parameter('alignment_weight', 1.0)
+        self.declare_parameter('separation_weight', 1.6)
+        self.declare_parameter('max_speed', 5.0)
+        self.declare_parameter('perception_radius', 15.0)
+        
         self.swarm_id = self.get_parameter('swarm_id').value
         
         # Abonelikler (Subscribers)
         self.state_sub = self.create_subscription(
             State,
-            f'mavros/state',
+            'mavros/state',
             self.state_cb,
             10
         )
         
+        # Diğer İHA'ların konumlarını dinleme simülasyonu
+        self.pose_sub = self.create_subscription(
+            PoseStamped,
+            '/swarm/positions',
+            self.pose_cb,
+            10
+        )
+        
+        # Yayıncılar (Publishers)
+        self.vel_pub = self.create_publisher(
+            Twist,
+            'mavros/setpoint_velocity/cmd_vel_unstamped',
+            10
+        )
+        
+        # Kendi konumunu diğerlerine yayınlama
+        self.my_pose_pub = self.create_publisher(
+            PoseStamped,
+            '/swarm/positions',
+            10
+        )
+        
         self.current_state = State()
-
+        self.neighbors = {} # id -> pose map
+        self.current_pose = PoseStamped()
+        
+        # Kontrol döngüsü (10 Hz)
+        self.control_timer = self.create_timer(0.1, self.control_loop) 
+        
     def state_cb(self, msg):
         self.current_state = msg
+
+    def pose_cb(self, msg):
+        # Gerçekte frame_id veya drone ID üzerinden ayrım yapılır
+        sender_id = msg.header.frame_id
+        if sender_id and sender_id != str(self.swarm_id):
+            self.neighbors[sender_id] = msg
+
+    def calculate_boids_velocity(self):
+        """Boids algoritması hesaplamaları (Cohesion, Alignment, Separation)."""
+        cohesion = [0.0, 0.0, 0.0]
+        alignment = [0.0, 0.0, 0.0]
+        separation = [0.0, 0.0, 0.0]
+        
+        if not self.neighbors:
+            return Twist() # Komşu yoksa varsayılan hızı koru veya dur
+            
+        c_weight = self.get_parameter('cohesion_weight').value
+        a_weight = self.get_parameter('alignment_weight').value
+        s_weight = self.get_parameter('separation_weight').value
+        radius = self.get_parameter('perception_radius').value
+        
+        count = 0
+        for n_id, n_pose in self.neighbors.items():
+            dx = self.current_pose.pose.position.x - n_pose.pose.position.x
+            dy = self.current_pose.pose.position.y - n_pose.pose.position.y
+            dist = math.sqrt(dx**2 + dy**2)
+            
+            if 0.1 < dist < radius:
+                # Separation: Yakın komşulardan uzaklaş
+                separation[0] += dx / dist
+                separation[1] += dy / dist
+                
+                # Cohesion: Sürünün merkezine yönel
+                cohesion[0] += n_pose.pose.position.x
+                cohesion[1] += n_pose.pose.position.y
+                
+                count += 1
+                
+        cmd_vel = Twist()
+        if count > 0:
+            cohesion[0] = (cohesion[0] / count - self.current_pose.pose.position.x) * c_weight
+            cohesion[1] = (cohesion[1] / count - self.current_pose.pose.position.y) * c_weight
+            
+            separation[0] *= s_weight
+            separation[1] *= s_weight
+            
+            # Sürü rotası birleşimi
+            cmd_vel.linear.x = cohesion[0] + separation[0]
+            cmd_vel.linear.y = cohesion[1] + separation[1]
+            
+            # Hız sınırlandırma (Max Speed clamp)
+            max_speed = self.get_parameter('max_speed').value
+            speed = math.sqrt(cmd_vel.linear.x**2 + cmd_vel.linear.y**2)
+            if speed > max_speed:
+                cmd_vel.linear.x = (cmd_vel.linear.x / speed) * max_speed
+                cmd_vel.linear.y = (cmd_vel.linear.y / speed) * max_speed
+                
+        return cmd_vel
+
+    def control_loop(self):
+        # FCU bağlantısı veya simülasyon aktif ise hesaplamayı yayınla
+        # Prototipe göre OFFBOARD modda veya her daim yayınlayabiliriz.
+        cmd = self.calculate_boids_velocity()
+        self.vel_pub.publish(cmd)
+        
+        # Test için hafif loglama
+        # self.get_logger().debug(f"Hız: X:{cmd.linear.x:.2f} Y:{cmd.linear.y:.2f}")
 
 def main(args=None):
     rclpy.init(args=args)
