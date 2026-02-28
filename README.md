@@ -184,10 +184,12 @@ graph TD
 ### 🔹 Çekirdek Modüller
 | Modül | Tanım | Protokol | Durum |
 | :--- | :--- | :--- | :--- |
-| **Sürü Çekirdeği** | `src/swarm_core` | `MAVLink/DDS` | 🟢 **AKTİF** |
+| **İşlem Birimi** | `src/swarm_core` | `MAVLink/DDS` | 🟢 **AKTİF** |
+| **Görev Modları** | `BOIDS / SEARCH` | `Dinamik` | 🟢 **AKTİF** |
 | **Simülasyon** | `src/swarm_simulation` | `Gazebo/SITL` | 🟢 **AKTİF** |
-| **Formasyon** | `V-Şekli/Eşelon` | `Adaptif PID` | 🟡 **TEST EDİLİYOR** |
-| **İletişim** | `MeshNet` | `UDP/TCP` | 🟢 **AKTİF** |
+| **Telemetri Kaydı** | `JSON Logger` | `Otonom` | 🟢 **AKTİF** |
+| **Görev Analizi** | `analyze_mission.py` | `Post-Process` | 🟢 **AKTİF** |
+| **CI/CD Hattı** | `GitHub Actions` | `Lint/Test` | 🟢 **AKTİF** |
 
 ---
 
@@ -263,7 +265,16 @@ ros2 launch swarm_simulation swarm_world.launch.py
 Grafik arayüzü olmayan sunucularda veya CI hatlarında çalıştırmak için:
 ```bash
 ros2 launch swarm_simulation swarm_world.launch.py gui:=false
+python3 src/swarm_core/swarm_core/analyze_mission.py <log_dosyasi>.json
 ```
+
+### 🛰️ Görev Modları (Mission Modes)
+Sürü, farklı görev profilleri arasında dinamik olarak geçiş yapabilir:
+- **BOIDS**: Ayrılma, Hizalanma ve Birleşme bazlı sürü koordinasyonu.
+- **SEARCH**: Arama-Kurtarma görevleri için Arşimet Spirali tabanlı alan tarama.
+
+*Mod değiştirmek için ROS 2 parametresini kullanın:*
+`ros2 param set /commander mission_mode SEARCH`
 
 ---
 

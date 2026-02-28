@@ -24,6 +24,8 @@ class SwarmCommander(Node):
         self.declare_parameter('safe_distance', 3.0)
         self.declare_parameter('max_speed', 5.0)
         self.declare_parameter('perception_radius', 15.0)
+        self.declare_parameter('mission_mode', 'BOIDS') # BOIDS, SEARCH (Spiral)
+        self.declare_parameter('enable_logging', True)
         self.declare_parameter('enable_logging', True)
         self.declare_parameter('log_interval', 1.0) # Saniyede bir kayıt
         
@@ -71,6 +73,7 @@ class SwarmCommander(Node):
         self.latest_scan = None
         self.neighbors = {} # id -> pose map
         self.current_pose = PoseStamped()
+        self.start_time = self.get_clock().now()
         
         # Telemetri Kaydı Hazırlığı
         self.enable_logging = self.get_parameter('enable_logging').value
@@ -180,10 +183,34 @@ class SwarmCommander(Node):
                 
         return cmd_vel
 
+    def calculate_search_velocity(self):
+        """Arama Kurtarma için Spiral (Arşimet Spirali) Deseni."""
+        t = (self.get_clock().now() - self.start_time).nanoseconds / 1e9
+        a = 0.5 # Büyüme katsayısı
+        b = 0.2 # Sıklık
+        
+        # Spiral formulü: r = a + b*theta
+        theta = b * t
+        r = a * theta
+        
+        target_x = r * math.cos(theta)
+        target_y = r * math.sin(theta)
+        
+        # Basit P kontrolcü
+        cmd_vel = Twist()
+        cmd_vel.linear.x = (target_x - (self.current_pose.pose.position.x % 50)) * 0.5
+        cmd_vel.linear.y = (target_y - (self.current_pose.pose.position.y % 50)) * 0.5
+        
+        return cmd_vel
+
     def control_loop(self):
-        # FCU bağlantısı veya simülasyon aktif ise hesaplamayı yayınla
-        # Prototipe göre OFFBOARD modda veya her daim yayınlayabiliriz.
-        cmd = self.calculate_boids_velocity()
+        mode = self.get_parameter('mission_mode').value
+        
+        if mode == 'SEARCH':
+            cmd = self.calculate_search_velocity()
+        else:
+            cmd = self.calculate_boids_velocity()
+            
         self.vel_pub.publish(cmd)
         
         # Test için hafif loglama
