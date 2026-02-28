@@ -1,23 +1,18 @@
-name: Özellik İsteği (Feature Request)
-description: Bu proje için bir fikir önerin
-labels: ["geliştirme", "enhancement"]
+name: Feature Request
+description: Suggest an idea for this project.
+labels: ["enhancement"]
 body:
   - type: textarea
     id: feature-description
     attributes:
-      label: Özellik isteğiniz bir sorunla mı ilgili?
-      description: Sorunun ne olduğuna dair açık ve özlü bir açıklama.
+      label: Feature Description
+      description: A concise description of what the feature is.
     validations:
       required: true
   - type: textarea
-    id: solution
+    id: use-case
     attributes:
-      label: İstediğiniz çözümü açıklayın
-      description: Ne olmasını istediğinize dair açık ve özlü bir açıklama.
+      label: Use Case
+      description: Why is this feature needed?
     validations:
       required: true
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Düşündüğünüz alternatifleri açıklayın
-      description: Düşündüğünüz alternatif çözümlerin veya özelliklerin açık ve özlü bir açıklaması.

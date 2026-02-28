@@ -113,6 +113,23 @@ Sistemimiz, hibrit bir haberleşme katmanı kullanmaktadır:
 | **Verimlilik** | Yüksek (Minimal Overhead) | Esnek (High Throughput) |
 | **Kritiklik** | Real-time Kontrol Döngüsü | Üst Seviye Görev Planlama |
 
+### 📈 Sürdürülebilirlik & İş Modeli (Business Model)
+Projemiz sadece teknik bir başarı değil, aynı zamanda ticarileşme potansiyeli yüksek bir girişimdir:
+
+#### **SWOT Analizi**
+| **Güçlü Yönler (S)** | **Zayıf Yönler (W)** |
+| :--- | :--- |
+| Hibrit haberleşme katmanı (MAVLink+DDS) | Yüksek donanım maliyetleri |
+| Gelişmiş siber-güvenlik protokolleri | GPS bağımlılığı (şimdilik) |
+| **Fırsatlar (O)** | **Tehditler (T)** |
+| Teknofest Girişim Programı desteği | Hızlı teknolojik eskime |
+| Genişleyen otonom tarım ve lojistik pazarı | Değişen UAV regülasyonları |
+
+#### **Değer Önerisi (Value Proposition)**
+- **Decentralized Reliability**: Tek bir İHA kaybında dahi operasyonu durdurmayan otonom yapı.
+- **Security-First**: Sinyal karıştırma ve sahteciliğe karşı entegre savunma.
+- **Scalable Framework**: 10'dan 100'e kadar İHA'yı destekleyen esnek mimari.
+
 ---
 
 
