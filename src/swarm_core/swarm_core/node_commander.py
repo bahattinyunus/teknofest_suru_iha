@@ -5,6 +5,10 @@ from geometry_msgs.msg import PoseStamped, Twist
 from mavros_msgs.msg import State
 from sensor_msgs.msg import LaserScan
 import math
+import json
+import os
+import time
+from datetime import datetime
 
 class SwarmCommander(Node):
     def __init__(self):
@@ -20,6 +24,8 @@ class SwarmCommander(Node):
         self.declare_parameter('safe_distance', 3.0)
         self.declare_parameter('max_speed', 5.0)
         self.declare_parameter('perception_radius', 15.0)
+        self.declare_parameter('enable_logging', True)
+        self.declare_parameter('log_interval', 1.0) # Saniyede bir kayıt
         
         self.swarm_id = self.get_parameter('swarm_id').value
         
@@ -66,6 +72,14 @@ class SwarmCommander(Node):
         self.neighbors = {} # id -> pose map
         self.current_pose = PoseStamped()
         
+        # Telemetri Kaydı Hazırlığı
+        self.enable_logging = self.get_parameter('enable_logging').value
+        if self.enable_logging:
+            self.log_file = f"mission_log_drone_{self.swarm_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            self.get_logger().info(f"Telemetri kaydı aktif: {self.log_file}")
+            self.mission_data = []
+            self.last_log_time = self.get_clock().now()
+        
         # Kontrol döngüsü (10 Hz)
         self.control_timer = self.create_timer(0.1, self.control_loop) 
         
@@ -99,7 +113,15 @@ class SwarmCommander(Node):
         # Gerçekte frame_id veya drone ID üzerinden ayrım yapılır
         sender_id = msg.header.frame_id
         if sender_id and sender_id != str(self.swarm_id):
-            self.neighbors[sender_id] = msg
+            # Mesafe bazlı filtreleme (Sadece belirli yarıçaptakileri komşu say)
+            dx = self.current_pose.pose.position.x - msg.pose.position.x
+            dy = self.current_pose.pose.position.y - msg.pose.position.y
+            dist = math.sqrt(dx**2 + dy**2)
+            
+            if dist < self.get_parameter('perception_radius').value:
+                self.neighbors[sender_id] = msg
+            elif sender_id in self.neighbors:
+                del self.neighbors[sender_id] # Menzil dışına çıktıysa sil
 
     def calculate_boids_velocity(self):
         """Boids algoritması hesaplamaları (Cohesion, Alignment, Separation)."""
@@ -166,6 +188,30 @@ class SwarmCommander(Node):
         
         # Test için hafif loglama
         # self.get_logger().debug(f"Hız: X:{cmd.linear.x:.2f} Y:{cmd.linear.y:.2f}")
+        
+        # Telemetri Kaydı (JSON)
+        if self.enable_logging:
+            now = self.get_clock().now()
+            if (now - self.last_log_time).nanoseconds / 1e9 >= self.get_parameter('log_interval').value:
+                record = {
+                    "timestamp": now.to_msg().sec,
+                    "pose": {
+                        "x": self.current_pose.pose.position.x,
+                        "y": self.current_pose.pose.position.y,
+                        "z": self.current_pose.pose.position.z
+                    },
+                    "velocity": {
+                        "x": cmd.linear.x,
+                        "y": cmd.linear.y
+                    },
+                    "neighbors_count": len(self.neighbors)
+                }
+                self.mission_data.append(record)
+                self.last_log_time = now
+                
+                # Periyodik dosya kaydı (güvenlik için)
+                with open(self.log_file, 'w') as f:
+                    json.dump(self.mission_data, f, indent=4)
 
 def main(args=None):
     rclpy.init(args=args)
