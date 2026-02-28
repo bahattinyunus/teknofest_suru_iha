@@ -48,6 +48,26 @@ Bu proje, küresel sürü robotatiği topluluğunun bir parçasıdır. Aşağıd
 | **RoboMaster TT Swarm** | SDK / Driver | 🔗 [tianbot/rmtt_ros](https://github.com/tianbot/rmtt_ros) |
 | **Crazyflie Firmware** | Firmware | 🔗 [bitcraze/crazyflie-firmware](https://github.com/bitcraze/crazyflie-firmware) |
 
+### 📊 Teknik Karşılaştırma ve Rakip Analizi (Technical Benchmarking)
+Sürü sistemleri, kullanım amacı ve teknoloji yığınına göre üç ana segmente ayrılmaktadır:
+
+| Özellik | **Düşük Maliyetli / Eğitim** (Tello/RoboMaster) | **Yüksek Hassasiyetli / Ar-Ge** (Crazyflie/Crazyswarm) | **Endüstriyel / Karmaşık Görev** (PX4/MAVSDK) |
+| :--- | :--- | :--- | :--- |
+| **Donanım Platformu** | DJI Tello Talent (ESP32) | Bitcraze Crazyflie (STM32) | Pixhawk / Custom UAV |
+| **Lokalizasyon** | ToF Sinyal / Wi-Fi | Motion Capture / Lighthouse | GPS / RTK / Vision-based |
+| **Kontrol Mimarisi** | Merkezi (Station Mode) | Merkezi/Dağıtık (ROS) | Dağıtık (MAVLink/DDS) |
+| **Simülasyon** | Gazebo / DroneBlocks | Crazyswarm Simulator | Gazebo / AirSim / SITL |
+| **Öne Çıkan Gücü** | Kolay Kurulum / Blok Kodlama | İç Mekan Hassasiyeti (mm bazlı) | Ölçeklenebilirlik / Dış Mekan |
+
+### 💡 Yeni Nesil Sürü Algoritmaları (SOTA Algorithms)
+Rakiplerin ve global projelerin kullandığı en güncel Sürü Zekası yaklaşımları:
+
+1.  **Bio-inspired Flocking**: Reynolds' Boids (Ayrılma, Hizalanma, Birleşme) algoritmalarının gelişmiş versiyonları.
+2.  **Decentralized Coordination (MANET)**: Merkezi bir lider olmadan, İHA'lar arası doğrudan veri alışverişi (Mesh Net).
+3.  **Autonomous Reallocation**: Bir İHA devre dışı kaldığında, sürünün otomatik olarak formasyonunu ve görevini güncellemesi.
+4.  **Neural Swarm Networks**: Karmaşık çevresel engellerden kaçınmak için derin pekiştirmeli öğrenme (DRL) tabanlı navigasyon.
+5.  **Stigmergy-based Search**: Böceklerin feromon bırakma davranışından esinlenen alan tarama algoritmaları.
+
 ---
 
 
