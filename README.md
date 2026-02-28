@@ -265,8 +265,14 @@ ros2 launch swarm_simulation swarm_world.launch.py
 Grafik arayüzü olmayan sunucularda veya CI hatlarında çalıştırmak için:
 ```bash
 ros2 launch swarm_simulation swarm_world.launch.py gui:=false
+```
+
+### 📊 Görev Analizi (Post-Mission Analysis)
+Görev sırasında toplanan verileri analiz etmek için:
+```bash
 python3 src/swarm_core/swarm_core/analyze_mission.py <log_dosyasi>.json
 ```
+*Bu araç, toplam kat edilen mesafe, ortalama hız ve sürü yoğunluğu gibi kritik verileri sağlar.*
 
 ### 🛰️ Görev Modları (Mission Modes)
 Sürü, farklı görev profilleri arasında dinamik olarak geçiş yapabilir:
