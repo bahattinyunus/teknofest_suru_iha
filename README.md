@@ -145,9 +145,16 @@ Sistemimiz, biyolojik sürü davranışlarını taklit eden yapay sinir ağları
 
 ---
 
-## 📐 Teknik Spesifikasyonlar: MAV-X Prototipi
-
 Her bir sürü elemanı, yüksek manevra kabiliyetine sahip, sensör füzyonu ile donatılmış özel bir İHA prototipidir.
+
+| Bileşen | Model / Teknik Özellik | Rol / Görev |
+| :--- | :--- | :--- |
+| **Uçuş Kontrolcü** | Orange Cube+ (OrangeBox) | Real-time stabilizasyon & MAVLink |
+| **Tamamlayıcı Bilgisayar** | NVIDIA Jetson Orin Nano | Sürü zekası, SLAM & Obje Tespiti |
+| **Haberleşme Modülü** | Herelink Blue / RFD900x | Uzun menzilli Mesh veri linki |
+| **Konumlandırma** | Here3+ RTK GPS / Optical Flow | Santimetrik hassasiyette konumlandırma |
+| **Güç Sistemi** | 4S/6S LiPo + T-Motor Ecosystem | Endüstriyel verimlilik & güç yönetimi |
+| **Sensör Füzyonu** | RPLIDAR A3 + Depth Camera | Dinamik engel kaçınma & 3D Haritalama |
 
 ![Drone Teknik Şeması](drone_blueprint_schematic.png)
 
@@ -184,25 +191,24 @@ graph TD
 
 ---
 
-## 📅 Görev Yol Haritası (Mission Roadmap)
-
 Projenin gelişim süreci ve gelecek hedefleri aşağıdadır.
 
 ```mermaid
 gantt
-    title Proje Geliştirme Takvimi
+    title Proje Geliştirme Takvimi & Stratejik Yol Haritası
     dateFormat  YYYY-MM-DD
-    section Hazırlık
-    Literatür Taraması       :done,    des1, 2024-11-01, 2024-11-15
-    Mimari Tasarım           :done,    des2, 2024-11-16, 2024-11-30
-    section Geliştirme
-    Simülasyon Ortamı        :active,  dev1, 2024-12-01, 2025-01-15
-    Sürü Algoritmaları       :active,  dev2, 2024-12-15, 2025-02-15
-    İletişim Altyapısı       :         dev3, 2025-01-01, 2025-02-01
-    section Test & Entegrasyon
-    SITL Testleri            :         tst1, 2025-02-15, 2025-03-15
-    Saha Testleri            :         tst2, 2025-03-15, 2025-04-15
-    Yarışma Tarihi           :crit,    event, 2025-04-20, 2025-04-25
+    section Hazırlık & Ar-Ge
+    Literatür & Mimari Tasarım   :done,    des1, 2024-11-01, 2024-11-30
+    Sürü Algoritmaları (v1.0)    :done,    dev1, 2024-12-01, 2025-02-15
+    section Faz 1: Teknofest 2025
+    SITL & Saha Testleri         :active,  tst1, 2025-02-15, 2025-04-15
+    Yarışma & Görev İcrası       :crit,    event, 2025-04-20, 2025-04-25
+    section Faz 2: Swarm-to-Swarm (2026)
+    Heterojen Sürü İşbirliği     :         rd2, 2026-01-01, 2026-06-01
+    Gelişmiş Mesh Networking     :         rd3, 2026-06-01, 2026-12-01
+    section Faz 3: Tam Otonomi (2027)
+    AI-Driven Orchestration      :         rd4, 2027-01-01, 2027-12-01
+    Kendi Kendini İyileştiren Sürü:        rd5, 2027-06-01, 2027-12-31
 ```
 
 ---
@@ -251,6 +257,12 @@ source install/setup.bash
 
 # Sürü Düğümünü başlatın
 ros2 launch swarm_simulation swarm_world.launch.py
+```
+
+### 🖥️ Headless Simülasyon (Sunucu Tipi)
+Grafik arayüzü olmayan sunucularda veya CI hatlarında çalıştırmak için:
+```bash
+ros2 launch swarm_simulation swarm_world.launch.py gui:=false
 ```
 
 ---
