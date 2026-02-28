@@ -84,6 +84,35 @@ Projemiz, **DARPA OFFSET** ve **MBZIRC** gibi üst düzey yarışmaların belirl
 - **Modülerlik**: DARPA'nın "Agile Sprints" metodolojisine benzer hızlı prototipleme mimarisi.
 - **Denial-Resilience**: GNSS-denied (GPS'siz) ortamlarda otonom navigasyon hedefleri.
 
+### 📐 Matematiksel Temeller (Mathematical Foundations)
+Sürü koordinasyonu, grafik teorisi ve dinamik sistemlerin birleşimine dayanır:
+
+1.  **Laplacian Konsensüs**: İHA'lar arası durum (konum/hız) anlaşması:
+    $$\dot{x}_i = - \sum_{j \in N_i} a_{ij} (x_i - x_j)$$
+    *Burada $L = D - A$ (Laplacian Matrisi), sistemin yakınsama hızını ve kararlılığını belirler.*
+
+2.  **Yapay Potansiyel Alanları (APF)**:
+    - **Cezbedici Güç ($U_{att}$)**: Hedefe yönelim.
+    - **İtici Güç ($U_{rep}$)**: Engel ve İHA arası çarpışma önleme.
+    $$F_{total} = -\nabla U_{att} - \nabla U_{rep}$$
+
+### 🛡️ Siber-Fiziksel Güvenlik (Cyber-Physical Security)
+Elektronik Harp (EW) koşullarında sürünün operasyonel sürekliliği için uygulanan stratejiler:
+
+- **GNSS Spoofing Tespiti**: GPS verisi ile IMU/Görsel Odometri verilerinin tutarlılık kontrolü ($L_2$ norm analizi).
+- **Adaptive Frequency Hopping**: Jamming (karıştırma) tespit edildiğinde dinamik kanal değişimi.
+- **Anomaly-based IDS**: Sürü içindeki "malicious" (ele geçirilmiş) düğümlerin, konsensüs dışı hareketlerinden otomatik tespiti.
+
+### 📡 Haberleşme Mimarisi: MAVLink 2 vs DDS
+Sistemimiz, hibrit bir haberleşme katmanı kullanmaktadır:
+
+| Özellik | **MAVLink 2** | **ROS 2 (DDS)** |
+| :--- | :--- | :--- |
+| **Kullanım** | Telemetri & Düşük Seviye Komut | Dağıtık İşlem & Sensör Paylaşımı |
+| **Güvenlik** | Message Signing (HMAC-SHA256) | TLS/DTLS Encryption |
+| **Verimlilik** | Yüksek (Minimal Overhead) | Esnek (High Throughput) |
+| **Kritiklik** | Real-time Kontrol Döngüsü | Üst Seviye Görev Planlama |
+
 ---
 
 
