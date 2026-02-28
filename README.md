@@ -68,6 +68,22 @@ Rakiplerin ve global projelerin kullandığı en güncel Sürü Zekası yaklaş�
 4.  **Neural Swarm Networks**: Karmaşık çevresel engellerden kaçınmak için derin pekiştirmeli öğrenme (DRL) tabanlı navigasyon.
 5.  **Stigmergy-based Search**: Böceklerin feromon bırakma davranışından esinlenen alan tarama algoritmaları.
 
+### 🎯 Global Standartlar ve Performans Metrikleri (KPIs)
+Projemiz, **DARPA OFFSET** ve **MBZIRC** gibi üst düzey yarışmaların belirlediği global başarı kriterleri ile uyumlu olarak geliştirilmektedir:
+
+| Metrik Grubu | KPI Tanımı | Hedef / Standart |
+| :--- | :--- | :--- |
+| **Operasyonel Verim** | **Exploration Ratio (Alan Tarama)** | %95+ kapsama kapasitesi |
+| **Sürü Dayanıklılığı** | **Robustness (Sağlamlık)** | %25 araç kaybında dahi görev devamlılığı |
+| **Hız ve Yanıt** | **Convergence Time** | Görev hedefine kilitlenme süresinin optimizasyonu |
+| **İletişim** | **Bandwidth Efficiency** | Minimum veri yükü ile maksimum koordinasyon |
+| **Otonomi** | **Decision Latency** | Dinamik engellere karşı <500ms tepki süresi |
+
+### 🌍 Global Hizalanma (International Alignment)
+- **Framework Uyumluluğu**: ROS 2 ve MAVLink standartlarında tam uyumluluk.
+- **Modülerlik**: DARPA'nın "Agile Sprints" metodolojisine benzer hızlı prototipleme mimarisi.
+- **Denial-Resilience**: GNSS-denied (GPS'siz) ortamlarda otonom navigasyon hedefleri.
+
 ---
 
 
