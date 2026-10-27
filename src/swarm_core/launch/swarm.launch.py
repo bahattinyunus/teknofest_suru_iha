@@ -49,6 +49,8 @@ def generate_launch_description():
                 {'enable_logging': True},
                 {'enable_security_ids': True},
                 {'failsafe_enabled': True},
+                {'enable_dynamic_election': True},
+                {'enable_geofence': True},
             ],
             output='screen',
             emulate_tty=True

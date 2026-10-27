@@ -6,7 +6,7 @@ and Byzantine / Anomaly Detection for Cyber-Physical Security.
 """
 
 import math
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any, Set
 
 
 class Vector3:
@@ -454,3 +454,170 @@ class FailSafeManager:
 
         self.current_state = 'NORMAL'
         return self.current_state
+
+
+class LeaderElectionEngine:
+    """
+    Decentralized Consensus & Dynamic Leader Election for Multi-UAV Swarms.
+    Ensures autonomous fault-recovery if the primary flight leader crashes,
+    runs out of battery, or is jammed by electronic warfare.
+    """
+    def __init__(self,
+                 self_id: int,
+                 initial_leader_id: int = 1,
+                 heartbeat_timeout: float = 2.0):
+        self.self_id = int(self_id)
+        self.current_leader_id = int(initial_leader_id)
+        self.heartbeat_timeout = heartbeat_timeout
+        self.last_leader_heartbeat = 0.0
+        self.term = 1
+
+    def record_leader_heartbeat(self, leader_id: int, timestamp: float):
+        if leader_id == self.current_leader_id:
+            self.last_leader_heartbeat = timestamp
+
+    def evaluate_election(self, timestamp: float, active_drone_ids: List[int]) -> int:
+        """
+        Evaluates leader health and conducts election if current leader timed out.
+        Returns the active leader ID.
+        """
+        all_candidates = set(active_drone_ids)
+        all_candidates.add(self.self_id)
+
+        # If current leader is self, maintain leadership
+        if self.current_leader_id == self.self_id:
+            return self.self_id
+
+        # Check if current leader timed out
+        time_since_hb = timestamp - self.last_leader_heartbeat
+        if time_since_hb > self.heartbeat_timeout:
+            # Current leader is lost. Elect active candidate with lowest ID (Bully / deterministic Raft)
+            eligible = sorted(list(all_candidates))
+            if eligible:
+                new_leader = eligible[0]
+                if new_leader != self.current_leader_id:
+                    self.current_leader_id = new_leader
+                    self.term += 1
+                    self.last_leader_heartbeat = timestamp
+            return self.current_leader_id
+
+        return self.current_leader_id
+
+    def is_leader(self) -> bool:
+        return self.self_id == self.current_leader_id
+
+
+class GeofenceManager:
+    """
+    3D Geofence & Keep-Out No-Fly Zone (NFZ) Safety Enforcer.
+    Calculates safety boundary repulsion forces to prevent flyaways.
+    """
+    def __init__(self,
+                 bounds: Tuple[float, float, float, float, float, float] = (-50.0, 50.0, -50.0, 50.0, 0.5, 30.0),
+                 safety_margin: float = 4.0,
+                 k_barrier: float = 3.5):
+        # bounds: (xmin, xmax, ymin, ymax, zmin, zmax)
+        self.xmin, self.xmax, self.ymin, self.ymax, self.zmin, self.zmax = bounds
+        self.safety_margin = safety_margin
+        self.k_barrier = k_barrier
+        # NFZs: list of (center_x, center_y, radius, min_z, max_z)
+        self.nfzs: List[Tuple[float, float, float, float, float]] = []
+
+    def add_nfz(self, x: float, y: float, radius: float, min_z: float = 0.0, max_z: float = 40.0):
+        self.nfzs.append((x, y, radius, min_z, max_z))
+
+    def is_inside(self, pos: Vector3) -> bool:
+        return (self.xmin <= pos.x <= self.xmax and
+                self.ymin <= pos.y <= self.ymax and
+                self.zmin <= pos.z <= self.zmax)
+
+    def is_in_nfz(self, pos: Vector3) -> bool:
+        for cx, cy, r, min_z, max_z in self.nfzs:
+            if min_z <= pos.z <= max_z:
+                dist_xy = math.sqrt((pos.x - cx)**2 + (pos.y - cy)**2)
+                if dist_xy < r:
+                    return True
+        return False
+
+    def compute_boundary_force(self, pos: Vector3) -> Vector3:
+        """Computes restorative repulsive force vector when approaching boundaries or NFZs."""
+        fx, fy, fz = 0.0, 0.0, 0.0
+
+        # X bounds
+        if pos.x < self.xmin + self.safety_margin:
+            dist = max(0.01, pos.x - self.xmin)
+            fx += self.k_barrier * ((self.safety_margin - dist) / self.safety_margin)
+        elif pos.x > self.xmax - self.safety_margin:
+            dist = max(0.01, self.xmax - pos.x)
+            fx -= self.k_barrier * ((self.safety_margin - dist) / self.safety_margin)
+
+        # Y bounds
+        if pos.y < self.ymin + self.safety_margin:
+            dist = max(0.01, pos.y - self.ymin)
+            fy += self.k_barrier * ((self.safety_margin - dist) / self.safety_margin)
+        elif pos.y > self.ymax - self.safety_margin:
+            dist = max(0.01, self.ymax - pos.y)
+            fy -= self.k_barrier * ((self.safety_margin - dist) / self.safety_margin)
+
+        # Z bounds (Floor & Ceiling)
+        if pos.z < self.zmin + 1.5:
+            fz += self.k_barrier * 1.5
+        elif pos.z > self.zmax - self.safety_margin:
+            dist = max(0.01, self.zmax - pos.z)
+            fz -= self.k_barrier * ((self.safety_margin - dist) / self.safety_margin)
+
+        # NFZ avoidance
+        for cx, cy, r, min_z, max_z in self.nfzs:
+            if min_z <= pos.z <= max_z:
+                dist_xy = math.sqrt((pos.x - cx)**2 + (pos.y - cy)**2)
+                effective_radius = r + self.safety_margin
+                if dist_xy < effective_radius:
+                    d = max(0.05, dist_xy)
+                    rep = self.k_barrier * ((effective_radius - d) / self.safety_margin)
+                    fx += rep * ((pos.x - cx) / d)
+                    fy += rep * ((pos.y - cy) / d)
+
+        return Vector3(fx, fy, fz)
+
+
+class TargetTracker:
+    """
+    Cooperative Multi-Agent Target Recognition & Consensus Engine.
+    Tracks detected competition ground targets / QR markers and eliminates false positives.
+    """
+    def __init__(self, confirmation_threshold: int = 2, proximity_radius: float = 5.0):
+        self.confirmation_threshold = confirmation_threshold
+        self.proximity_radius = proximity_radius
+        # targets: target_id -> {'pos': Vector3, 'detectors': set, 'confirmed': bool, 'timestamp': float}
+        self.targets: Dict[str, Dict[str, Any]] = {}
+
+    def report_detection(self, target_id: str, pos: Vector3, detector_id: int, timestamp: float) -> bool:
+        """
+        Registers a detection report from a drone.
+        Returns True if target achieved multi-agent confirmed status.
+        """
+        if target_id not in self.targets:
+            self.targets[target_id] = {
+                'pos': pos,
+                'detectors': {detector_id},
+                'confirmed': False,
+                'timestamp': timestamp
+            }
+        else:
+            t = self.targets[target_id]
+            # Verify proximity to existing estimate
+            if t['pos'].distance_to(pos) <= self.proximity_radius:
+                t['detectors'].add(detector_id)
+                # Running average position
+                t['pos'] = (t['pos'] + pos) / 2.0
+                t['timestamp'] = timestamp
+
+        target = self.targets[target_id]
+        if len(target['detectors']) >= self.confirmation_threshold:
+            target['confirmed'] = True
+            return True
+        return False
+
+    def get_confirmed_targets(self) -> List[Dict[str, Any]]:
+        return [{'id': tid, 'pos': d['pos'], 'detectors': list(d['detectors'])}
+                for tid, d in self.targets.items() if d['confirmed']]

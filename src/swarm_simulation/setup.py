@@ -23,6 +23,8 @@ setup(
     license='MIT',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [],
+        'console_scripts': [
+            'mock_sitl = swarm_simulation.mock_sitl_bridge:main',
+        ],
     },
 )

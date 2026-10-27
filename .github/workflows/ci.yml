@@ -10,7 +10,7 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: src/swarm_core
+      PYTHONPATH: src/swarm_core:src/swarm_simulation
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python

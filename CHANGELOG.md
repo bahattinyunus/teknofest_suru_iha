@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-10-28
+### Added
+- **Dynamic Leader Election (`LeaderElectionEngine`)**:
+  - Decentralized consensus mechanism allowing the swarm to autonomously elect a new leader if the primary leader drops out or is compromised.
+- **3D Geofence & NFZ Manager (`GeofenceManager`)**:
+  - Enforces competition boundary constraints with restorative barrier potential forces and keep-out cylinder No-Fly Zones.
+- **Cooperative Target Recognition (`TargetTracker`)**:
+  - Multi-agent target detection and consensus engine to confirm ground targets and eliminate false positives.
+- **Interactive Web Ground Control Station (`web_gcs.py`)**:
+  - Zero-dependency HTTP/HTML5 tactical GCS with live 2D canvas radar, fleet health telemetry cards, formation control buttons, and event logs on port 8080.
+- **TEKNOFEST Referee Bridge (`referee_bridge.py`)**:
+  - Competition-compliant telemetry and target detection UDP/JSON packet generation and bridge interface.
+- **Fast Multi-UAV SITL Engine (`mock_sitl_bridge.py`)**:
+  - Lightweight 6-DoF kinematics and 2D LiDAR raycaster allowing instant swarm simulation without requiring Gazebo.
+- **Competition Arena World (`teknofest_arena.world`)**:
+  - 3D Gazebo competition world with perimeter pylons, obstacle towers, and QR target markers.
+- **Expanded Test Suite**:
+  - 27 unit tests (up from 19) covering all algorithmic engines, referee packets, geofence barriers, and physics kinematics.
+
+### Improved
+- **Swarm Commander Integration**:
+  - Dynamic leader failover and 3D boundary forces directly embedded in `node_commander.py` control loop.
+- **Launch Configurations**:
+  - `swarm.launch.py` and `simulation.launch.py` updated with `use_mock`, `world`, and safety parameters.
+
 ## [1.3.1] - 2026-10-28
 ### Added & Improved
 - **Futuristic Hero Banner**: Designed and integrated a high-resolution, cinematic 16:9 aerospace banner depicting an autonomous multi-UAV swarm in V-formation with glowing cyan mesh network telemetry lines and HUD overlays.

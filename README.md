@@ -6,8 +6,8 @@
 ### Sürü İHA (Swarm UAV) • "Gökyüzünde Takım Oyunu"
 
 [![Lisans](https://img.shields.io/badge/LISANS-MIT-00E5FF?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
-[![Sürüm](https://img.shields.io/badge/SURUM-v1.3.1-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
-[![Testler](https://img.shields.io/badge/TESTLER-19%20GECTI-00E5FF?style=for-the-badge&logo=pytest&logoColor=white)](.github/workflows/ci.yml)
+[![Sürüm](https://img.shields.io/badge/SURUM-v1.4.0-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
+[![Testler](https://img.shields.io/badge/TESTLER-27%20GECTI-00E5FF?style=for-the-badge&logo=pytest&logoColor=white)](.github/workflows/ci.yml)
 [![Durum](https://img.shields.io/badge/SISTEM-OPERASYONEL-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://github.com/bahattinyunus/teknofest_suru_iha)
 [![Çerçeve](https://img.shields.io/badge/CEKIRDEK-ROS2_HUMBLE-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://docs.ros.org/en/humble/)
 [![Simülasyon](https://img.shields.io/badge/SIM-GAZEBO-00E5FF?style=for-the-badge&logo=gazebo&logoColor=white)](https://gazebosim.org/)
@@ -185,12 +185,15 @@ graph TD
 ### 🔹 Çekirdek Modüller
 | Modül | Dosya / Dizin | Protokol / Görev | Durum |
 | :--- | :--- | :--- | :--- |
-| **Algoritmik Motor** | `swarm_core/algorithms.py` | Boids, Formasyon, APF, SAR & IDS Motoru | 🟢 **AKTİF** |
-| **Komuta Düğümü** | `swarm_core/node_commander.py` | ROS 2 Çoklu İHA Otonom Seyrüsefer | 🟢 **AKTİF** |
+| **Algoritmik Motor** | `swarm_core/algorithms.py` | Boids, Formasyon, APF, SAR, IDS, Lider Seçimi & Geofence | 🟢 **AKTİF** |
+| **Komuta Düğümü** | `swarm_core/node_commander.py` | ROS 2 Çoklu İHA Otonom Seyrüsefer & Lider İyileşme | 🟢 **AKTİF** |
+| **Web Yer İstasyonu (GCS)** | `swarm_core/web_gcs.py` | HTML5/Canvas Taktik Radar & Canlı Filo Yönetimi | 🟢 **AKTİF** |
+| **Hakem Köprüsü** | `swarm_core/referee_bridge.py` | TEKNOFEST Hakem Sunucusu UDP/JSON Entegrasyonu | 🟢 **AKTİF** |
 | **Canlı Telemetri** | `swarm_core/dashboard.py` | Terminal Tabanlı Kütle Merkezi & Dağılım İzleme | 🟢 **AKTİF** |
 | **Görev Analizi** | `swarm_core/analyze_mission.py` | Post-Process KPI, Markdown & JSON Raporlama | 🟢 **AKTİF** |
-| **Simülasyon** | `src/swarm_simulation` | Gazebo Çoklu İHA Dünyası & Başlatma Dosyaları | 🟢 **AKTİF** |
-| **Sürekli Entegrasyon** | `.github/workflows/` | Pytest (19/19 Test) & ROS 2 Humble CI | 🟢 **AKTİF** |
+| **Hızlı SITL Simülatörü** | `swarm_simulation/mock_sitl_bridge.py` | Hafif 6-DoF Kinematik & LiDAR Işın Simülasyonu | 🟢 **AKTİF** |
+| **3D Yarışma Arenası** | `swarm_simulation/worlds/` | Gazebo Teknofest Engel & Kule Parkuru Dünyası | 🟢 **AKTİF** |
+| **Sürekli Entegrasyon** | `.github/workflows/` | Pytest (27/27 Test) & ROS 2 Humble CI | 🟢 **AKTİF** |
 
 ---
 
@@ -282,8 +285,30 @@ ros2 param set /drone_1/swarm_commander_1 mission_mode FORMATION
 ros2 param set /drone_1/swarm_commander_1 formation_type V_SHAPE
 ```
 
+### 🌐 Web Tabanlı Taktik Yer Kontrol İstasyonu (Web GCS)
+Sürüyü herhangi bir harici bağımlılık gerektirmeden modern HTML5/Canvas taktik radar üzerinden 2D/3D harita ile izlemek ve interaktif komutlar göndermek için:
+```bash
+# Web GCS sunucusunu başlatın (Port 8080)
+ros2 run swarm_core web_gcs
+# Veya saf Python ile: python3 -m swarm_core.web_gcs
+```
+Tarayıcınızdan açın: `http://localhost:8080`  
+*Özellikler:* Canlı radar göstergesi, 5 İHA filo telemetri kartları, dinamik formasyon seçimi, acil RTL butonu ve hedef tespit paneli.
+
+### 📡 TEKNOFEST Hakem Sunucusu Köprüsü (Referee Bridge)
+Yarışma hakem sunucusuna resmi telemetri ve hedef tespit paketlerini (`TELEMETRI`, `HEDEF_TESPIT`) iletmek için:
+```bash
+ros2 run swarm_core referee --ros-args -p team_id:=1453 -p server_ip:=127.0.0.1 -p server_port:=5005
+```
+
+### ⚡ Hızlı Çoklu İHA Simülasyonu (Fast Mock SITL)
+Ağır Gazebo grafik arayüzüne ihtiyaç duymadan hafif ve hızlı test yapmak için dahili 6-DoF kinematik simülatör:
+```bash
+ros2 run swarm_simulation mock_sitl --ros-args -p num_drones:=5
+```
+
 ### 🖥️ Canlı Telemetri Paneli (Command Dashboard)
-Sürüdeki tüm İHA'ların anlık konumlarını, kütle merkezini, dağılım yarıçapını ve güvenlik durumunu izlemek için:
+Terminal üzerinden sürü kütle merkezini, yayılım yarıçapını ve bağlantı sağlığını izlemek için:
 ```bash
 ros2 run swarm_core dashboard
 ```
@@ -299,7 +324,7 @@ python3 src/swarm_core/swarm_core/analyze_mission.py mission_log_drone_1_*.json 
 ---
 
 ## 🧪 Birim Testleri & Kalite Güvencesi
-Algoritmalar ve komuta mantığı 19 kapsamlı birim testi ile doğrulanmaktadır:
+Sürü algoritmaları, lider seçimi, geofence sınırları, hakem köprüsü ve kinematik dinamikler 27 kapsamlı birim testi ile doğrulanmaktadır:
 ```bash
 pytest -v
 ```

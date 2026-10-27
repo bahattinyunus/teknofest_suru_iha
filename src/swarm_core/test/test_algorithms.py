@@ -7,7 +7,10 @@ from swarm_core.algorithms import (
     ArtificialPotentialField,
     SearchPatternGenerator,
     AnomalyDetector,
-    FailSafeManager
+    FailSafeManager,
+    LeaderElectionEngine,
+    GeofenceManager,
+    TargetTracker
 )
 
 
@@ -211,3 +214,66 @@ def test_failsafe_manager():
     # Critical low battery (< 14.0V)
     state = fs.evaluate(last_heartbeat_age=0.5, battery_voltage=13.5)
     assert state == 'LAND'
+
+
+def test_leader_election_engine():
+    engine = LeaderElectionEngine(self_id=2, initial_leader_id=1, heartbeat_timeout=2.0)
+
+    # Initial state
+    assert engine.current_leader_id == 1
+    assert engine.is_leader() is False
+
+    # Leader 1 is active (fresh heartbeat)
+    engine.record_leader_heartbeat(leader_id=1, timestamp=10.0)
+    elected = engine.evaluate_election(timestamp=11.0, active_drone_ids=[1, 2, 3])
+    assert elected == 1
+
+    # Leader 1 times out (> 2.0s without heartbeat, e.g. at t=15.0)
+    # Remaining active candidates: [2, 3]
+    elected_after_failure = engine.evaluate_election(timestamp=15.0, active_drone_ids=[2, 3])
+    # Drone 2 has lowest ID among active candidates, promoted to leader
+    assert elected_after_failure == 2
+    assert engine.is_leader() is True
+    assert engine.term == 2
+
+
+def test_geofence_manager():
+    geo = GeofenceManager(
+        bounds=(-50.0, 50.0, -50.0, 50.0, 0.5, 30.0),
+        safety_margin=5.0,
+        k_barrier=4.0
+    )
+    geo.add_nfz(x=10.0, y=10.0, radius=5.0, min_z=0.0, max_z=25.0)
+
+    # In center: nominal, no boundary force
+    pos_center = Vector3(0.0, 0.0, 15.0)
+    assert geo.is_inside(pos_center) is True
+    assert geo.is_in_nfz(pos_center) is False
+    f_center = geo.compute_boundary_force(pos_center)
+    assert (f_center.x, f_center.y, f_center.z) == (0.0, 0.0, 0.0)
+
+    # Near +X boundary (x=48 > 45)
+    pos_near_east = Vector3(48.0, 0.0, 15.0)
+    f_east = geo.compute_boundary_force(pos_near_east)
+    # Force must push back west (-x)
+    assert f_east.x < 0.0
+
+    # Inside NFZ at (10, 10)
+    pos_in_nfz = Vector3(10.0, 10.0, 10.0)
+    assert geo.is_in_nfz(pos_in_nfz) is True
+
+
+def test_target_tracker():
+    tracker = TargetTracker(confirmation_threshold=2, proximity_radius=5.0)
+
+    # First detection from drone 1
+    confirmed = tracker.report_detection('TARGET_1', Vector3(12.0, 14.0, 0.0), detector_id=1, timestamp=100.0)
+    assert confirmed is False
+
+    # Second detection from drone 2 within proximity
+    confirmed = tracker.report_detection('TARGET_1', Vector3(12.2, 13.8, 0.0), detector_id=2, timestamp=101.0)
+    assert confirmed is True
+
+    targets = tracker.get_confirmed_targets()
+    assert len(targets) == 1
+    assert targets[0]['id'] == 'TARGET_1'

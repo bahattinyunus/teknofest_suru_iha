@@ -13,6 +13,8 @@ swarm_settings:
     obstacle_weight: 2.5 # Potential field obstacle repulsion factor
     enable_security_ids: true # Anomaly & GNSS spoofing intrusion detection
     failsafe_enabled: true # Autonomous Return-to-Launch on signal loss
+    enable_dynamic_election: true # Autonomous decentralized leader failover
+    enable_geofence: true # 3D competition flight boundary enforcement
     target_x: 0.0 # Waypoint goal coordinate X
     target_y: 0.0 # Waypoint goal coordinate Y
     target_z: 10.0 # Waypoint cruise altitude Z

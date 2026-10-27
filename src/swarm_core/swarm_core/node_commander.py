@@ -28,7 +28,10 @@ from swarm_core.algorithms import (
     ArtificialPotentialField,
     SearchPatternGenerator,
     AnomalyDetector,
-    FailSafeManager
+    FailSafeManager,
+    LeaderElectionEngine,
+    GeofenceManager,
+    TargetTracker
 )
 
 
@@ -60,6 +63,8 @@ class SwarmCommander(Node):
         self.declare_parameter('log_interval', 1.0)
         self.declare_parameter('enable_security_ids', True)
         self.declare_parameter('failsafe_enabled', True)
+        self.declare_parameter('enable_dynamic_election', True)
+        self.declare_parameter('enable_geofence', True)
 
         self.swarm_id = self.get_parameter('swarm_id').value
         self.leader_id = self.get_parameter('leader_id').value
@@ -97,6 +102,20 @@ class SwarmCommander(Node):
         )
 
         self.failsafe = FailSafeManager(heartbeat_timeout=3.0)
+
+        self.election_engine = LeaderElectionEngine(
+            self_id=self.swarm_id,
+            initial_leader_id=self.leader_id,
+            heartbeat_timeout=2.0
+        )
+
+        self.geofence = GeofenceManager(
+            bounds=(-50.0, 50.0, -50.0, 50.0, 0.5, 30.0),
+            safety_margin=4.0,
+            k_barrier=3.5
+        )
+
+        self.target_tracker = TargetTracker()
 
         # Internal State
         self.current_state = State()
@@ -223,6 +242,10 @@ class SwarmCommander(Node):
             dt = now_sec - prev['time']
             if dt > 0.001:
                 n_vel = (new_pos - prev['pos']) / dt
+
+        # Record leader heartbeat for dynamic election
+        if sender_id == str(self.leader_id):
+            self.election_engine.record_leader_heartbeat(self.leader_id, now_sec)
 
         # Distance filter (only keep neighbors within perception radius)
         curr_vec = Vector3(
@@ -384,6 +407,20 @@ class SwarmCommander(Node):
         """Main periodic control loop at 10 Hz."""
         self.prune_stale_neighbors()
         mode = self.get_parameter('mission_mode').value
+        curr_pos = Vector3(
+            self.current_pose.pose.position.x,
+            self.current_pose.pose.position.y,
+            self.current_pose.pose.position.z
+        )
+
+        # Autonomous Dynamic Leader Election evaluation
+        if self.get_parameter('enable_dynamic_election').value:
+            now_sec = time.time()
+            active_ids = [int(nid) for nid in self.neighbors.keys() if nid.isdigit()]
+            new_leader = self.election_engine.evaluate_election(now_sec, active_ids)
+            if new_leader != self.leader_id:
+                self.get_logger().info(f"Otonom Lider Değişimi: Yeni Lider İHA-{new_leader}")
+                self.leader_id = new_leader
 
         # Evaluate FailSafe state
         if self.get_parameter('failsafe_enabled').value:
@@ -409,7 +446,13 @@ class SwarmCommander(Node):
         if mode != 'APF':
             obs_force = self.calculate_obstacle_avoidance()
             cmd_vec = cmd_vec + obs_force
-            cmd_vec = cmd_vec.clamp(self.get_parameter('max_speed').value)
+
+        # Geofence boundary & Keep-Out NFZ enforcement
+        if self.get_parameter('enable_geofence').value:
+            geo_force = self.geofence.compute_boundary_force(curr_pos)
+            cmd_vec = cmd_vec + geo_force
+
+        cmd_vec = cmd_vec.clamp(self.get_parameter('max_speed').value)
 
         # Publish Twist command
         twist_msg = Twist()
@@ -438,6 +481,8 @@ class SwarmCommander(Node):
                         "z": cmd_vec.z
                     },
                     "neighbors_count": len(self.neighbors),
+                    "active_leader_id": self.leader_id,
+                    "geofence_inside": self.geofence.is_inside(curr_pos),
                     "anomalous_nodes": list(self.anomaly_detector.flagged_nodes),
                     "failsafe_status": self.failsafe.current_state
                 }

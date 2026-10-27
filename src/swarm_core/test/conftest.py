@@ -2,10 +2,14 @@ import sys
 import os
 from unittest.mock import MagicMock
 
-# Ensure src/swarm_core is in sys.path
+# Ensure src/swarm_core and src/swarm_simulation are in sys.path
 core_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if core_dir not in sys.path:
     sys.path.insert(0, core_dir)
+
+sim_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'swarm_simulation'))
+if sim_dir not in sys.path:
+    sys.path.insert(0, sim_dir)
 
 # Mock ROS 2 packages if not installed in the current environment
 try:

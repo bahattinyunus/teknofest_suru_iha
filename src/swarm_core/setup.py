@@ -27,6 +27,8 @@ setup(
             'commander = swarm_core.node_commander:main',
             'dashboard = swarm_core.dashboard:main',
             'analyze = swarm_core.analyze_mission:main',
+            'referee = swarm_core.referee_bridge:main',
+            'web_gcs = swarm_core.web_gcs:main',
         ],
     },
 )
