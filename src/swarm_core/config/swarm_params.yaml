@@ -1,6 +1,18 @@
 swarm_settings:
   ros__parameters:
-    formation_type: "V-shape"
-    min_separation: 2.5 # meters
-    max_velocity: 15.0 # m/s
-    leader_id: 1
+    formation_type: "V_SHAPE" # Supported: V_SHAPE, LINE, COLUMN, CIRCLE, GRID
+    formation_spacing: 3.5 # Distance between formation slots in meters
+    min_separation: 2.5 # Minimum collision avoidance threshold
+    max_velocity: 5.0 # Maximum operational speed (m/s)
+    leader_id: 1 # Designated flight leader ID
+    total_drones: 5 # Total active UAV count in swarm
+    mission_mode: "BOIDS" # Operational modes: BOIDS, FORMATION, SEARCH, APF, RTL
+    search_pattern: "SPIRAL" # Search patterns: SPIRAL, LAWNMOWER
+    perception_radius: 20.0 # Inter-UAV mesh awareness radius (m)
+    safe_distance: 3.0 # LiDAR obstacle safety buffer (m)
+    obstacle_weight: 2.5 # Potential field obstacle repulsion factor
+    enable_security_ids: true # Anomaly & GNSS spoofing intrusion detection
+    failsafe_enabled: true # Autonomous Return-to-Launch on signal loss
+    target_x: 0.0 # Waypoint goal coordinate X
+    target_y: 0.0 # Waypoint goal coordinate Y
+    target_z: 10.0 # Waypoint cruise altitude Z

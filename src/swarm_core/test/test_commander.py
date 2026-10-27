@@ -1,17 +1,10 @@
 import unittest
-import rclpy
 from swarm_core.node_commander import SwarmCommander
+from swarm_core.algorithms import Vector3
 from geometry_msgs.msg import PoseStamped, Twist
 
+
 class TestSwarmCommander(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        rclpy.init()
-
-    @classmethod
-    def tearDownClass(cls):
-        rclpy.shutdown()
-
     def setUp(self):
         self.node = SwarmCommander()
 
@@ -23,34 +16,40 @@ class TestSwarmCommander(unittest.TestCase):
         self.assertEqual(self.node.get_name(), 'swarm_commander')
         self.assertEqual(self.node.swarm_id, 1)
 
-    def test_boids_no_neighbors(self):
-        """Test that with no neighbors, velocity is zero."""
-        cmd_vel = self.node.calculate_boids_velocity()
-        self.assertEqual(cmd_vel.linear.x, 0.0)
-        self.assertEqual(cmd_vel.linear.y, 0.0)
-        self.assertEqual(cmd_vel.linear.z, 0.0)
+    def test_boids_cmd_generation(self):
+        """Test that SwarmCommander produces valid velocity vector."""
+        cmd = self.node.calculate_boids_cmd()
+        self.assertIsInstance(cmd, Vector3)
 
-    def test_boids_with_neighbor(self):
-        """Test basic reaction to a neighbor."""
-        # Setup a neighbor pose
-        neighbor_pose = PoseStamped()
-        neighbor_pose.header.frame_id = "2"
-        neighbor_pose.pose.position.x = 5.0
-        neighbor_pose.pose.position.y = 0.0
-        
-        # Add to neighbors directly for testing
-        self.node.neighbors["2"] = neighbor_pose
-        
-        # Node itself is at 0, 0
-        cmd_vel = self.node.calculate_boids_velocity()
-        
-        # distance is 5.0. Perception radius is 15.0 by default.
-        # it will be considered.
-        # Ensure it doesn't just crash and returns a Twist message
-        self.assertIsInstance(cmd_vel, Twist)
-        
-        # Based on default logic, it should move towards the neighbor (cohesion)
-        self.assertNotEqual(cmd_vel.linear.x, 0.0)
+    def test_neighbor_tracking_and_boids(self):
+        """Test that adding a neighbor affects swarm velocity calculation."""
+        # Simulate receiving neighbor telemetry
+        self.node.neighbors['2'] = {
+            'pos': Vector3(4.0, 0.0, 10.0),
+            'vel': Vector3(0.0, 0.0, 0.0),
+            'time': 1000.0
+        }
+        cmd = self.node.calculate_boids_cmd()
+        self.assertIsInstance(cmd, Vector3)
+        # With default cohesion, it should move towards neighbor (+x)
+        self.assertGreater(cmd.x, 0.0)
+
+    def test_formation_cmd_generation(self):
+        """Test formation command generation in leader and follower roles."""
+        # Leader mode (swarm_id == leader_id == 1)
+        cmd_leader = self.node.calculate_formation_cmd()
+        self.assertIsInstance(cmd_leader, Vector3)
+
+        # Follower mode (set swarm_id to 2)
+        self.node.swarm_id = 2
+        self.node.neighbors['1'] = {
+            'pos': Vector3(0.0, 0.0, 10.0),
+            'vel': Vector3(2.0, 0.0, 0.0),
+            'time': 1000.0
+        }
+        cmd_follower = self.node.calculate_formation_cmd()
+        self.assertIsInstance(cmd_follower, Vector3)
+
 
 if __name__ == '__main__':
     unittest.main()

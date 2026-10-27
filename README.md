@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # 🚁 TEKNOFEST SÜRÜ ZEKASI KOMUTA MERKEZİ
 ### Sürü İHA (Swarm UAV) Yarışması 2025
@@ -6,6 +6,8 @@
 ![Sürü Komuta Merkezi](visionary_swarm_banner.png)
 
 [![Lisans](https://img.shields.io/badge/LISANS-MIT-00E5FF?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
+[![Sürüm](https://img.shields.io/badge/SURUM-v1.3.0-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
+[![Testler](https://img.shields.io/badge/TESTLER-19%20GECTI-00E5FF?style=for-the-badge&logo=pytest&logoColor=white)](.github/workflows/ci.yml)
 [![Durum](https://img.shields.io/badge/SISTEM-OPERASYONEL-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://github.com/bahattinyunus/teknofest_suru_iha)
 [![Çerçeve](https://img.shields.io/badge/CEKIRDEK-ROS2_HUMBLE-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://docs.ros.org/en/humble/)
 [![Simülasyon](https://img.shields.io/badge/SIM-GAZEBO-00E5FF?style=for-the-badge&logo=gazebo&logoColor=white)](https://gazebosim.org/)
@@ -99,9 +101,9 @@ Sürü koordinasyonu, grafik teorisi ve dinamik sistemlerin birleşimine dayanı
 ### 🛡️ Siber-Fiziksel Güvenlik (Cyber-Physical Security)
 Elektronik Harp (EW) koşullarında sürünün operasyonel sürekliliği için uygulanan stratejiler:
 
-- **GNSS Spoofing Tespiti**: GPS verisi ile IMU/Görsel Odometri verilerinin tutarlılık kontrolü ($L_2$ norm analizi).
-- **Adaptive Frequency Hopping**: Jamming (karıştırma) tespit edildiğinde dinamik kanal değişimi.
-- **Anomaly-based IDS**: Sürü içindeki "malicious" (ele geçirilmiş) düğümlerin, konsensüs dışı hareketlerinden otomatik tespiti.
+- **GNSS Spoofing & Teleportation Tespiti**: Kinematik kısıt kontrolü (anlık hız > 25 m/s veya irtifa limit dışı durumları).
+- **Byzantine Fault Isolation**: Sürü içindeki sahtelenmiş ("malicious") düğümlerin, konsensüs dışı hareketlerinden otomatik tespiti ve sürüden dışlanması.
+- **Autonomous Fail-Safe**: Haberleşme karartması durumunda otomatik **Return-to-Launch (RTL)** geçişi.
 
 ### 📡 Haberleşme Mimarisi: MAVLink 2 vs DDS
 Sistemimiz, hibrit bir haberleşme katmanı kullanmaktadır:
@@ -120,7 +122,7 @@ Projemiz sadece teknik bir başarı değil, aynı zamanda ticarileşme potansiye
 | **Güçlü Yönler (S)** | **Zayıf Yönler (W)** |
 | :--- | :--- |
 | Hibrit haberleşme katmanı (MAVLink+DDS) | Yüksek donanım maliyetleri |
-| Gelişmiş siber-güvenlik protokolleri | GPS bağımlılığı (şimdilik) |
+| Gelişmiş siber-güvenlik protokolleri & IDS | GPS bağımlılığı (şimdilik) |
 | **Fırsatlar (O)** | **Tehditler (T)** |
 | Teknofest Girişim Programı desteği | Hızlı teknolojik eskime |
 | Genişleyen otonom tarım ve lojistik pazarı | Değişen UAV regülasyonları |
@@ -131,7 +133,6 @@ Projemiz sadece teknik bir başarı değil, aynı zamanda ticarileşme potansiye
 - **Scalable Framework**: 10'dan 100'e kadar İHA'yı destekleyen esnek mimari.
 
 ---
-
 
 ## 🌐 Görev Tanımı
 **"Uçuşta Birlik, Sayılarda Zeka"**
@@ -182,35 +183,36 @@ graph TD
 ```
 
 ### 🔹 Çekirdek Modüller
-| Modül | Tanım | Protokol | Durum |
+| Modül | Dosya / Dizin | Protokol / Görev | Durum |
 | :--- | :--- | :--- | :--- |
-| **İşlem Birimi** | `src/swarm_core` | `MAVLink/DDS` | 🟢 **AKTİF** |
-| **Görev Modları** | `BOIDS / SEARCH` | `Dinamik` | 🟢 **AKTİF** |
-| **Simülasyon** | `src/swarm_simulation` | `Gazebo/SITL` | 🟢 **AKTİF** |
-| **Telemetri Kaydı** | `JSON Logger` | `Otonom` | 🟢 **AKTİF** |
-| **Görev Analizi** | `analyze_mission.py` | `Post-Process` | 🟢 **AKTİF** |
-| **CI/CD Hattı** | `GitHub Actions` | `Lint/Test` | 🟢 **AKTİF** |
+| **Algoritmik Motor** | `swarm_core/algorithms.py` | Boids, Formasyon, APF, SAR & IDS Motoru | 🟢 **AKTİF** |
+| **Komuta Düğümü** | `swarm_core/node_commander.py` | ROS 2 Çoklu İHA Otonom Seyrüsefer | 🟢 **AKTİF** |
+| **Canlı Telemetri** | `swarm_core/dashboard.py` | Terminal Tabanlı Kütle Merkezi & Dağılım İzleme | 🟢 **AKTİF** |
+| **Görev Analizi** | `swarm_core/analyze_mission.py` | Post-Process KPI, Markdown & JSON Raporlama | 🟢 **AKTİF** |
+| **Simülasyon** | `src/swarm_simulation` | Gazebo Çoklu İHA Dünyası & Başlatma Dosyaları | 🟢 **AKTİF** |
+| **Sürekli Entegrasyon** | `.github/workflows/` | Pytest (19/19 Test) & ROS 2 Humble CI | 🟢 **AKTİF** |
 
 ---
 
-Projenin gelişim süreci ve gelecek hedefleri aşağıdadır.
+### 🗺️ Geliştirme Yol Haritası (Roadmap)
 
 ```mermaid
-gantt
-    title Proje Geliştirme Takvimi & Stratejik Yol Haritası
-    dateFormat  YYYY-MM-DD
-    section Hazırlık & Ar-Ge
-    Literatür & Mimari Tasarım   :done,    des1, 2024-11-01, 2024-11-30
-    Sürü Algoritmaları (v1.0)    :done,    dev1, 2024-12-01, 2025-02-15
-    section Faz 1: Teknofest 2025
-    SITL & Saha Testleri         :active,  tst1, 2025-02-15, 2025-04-15
-    Yarışma & Görev İcrası       :crit,    event, 2025-04-20, 2025-04-25
-    section Faz 2: Swarm-to-Swarm (2026)
-    Heterojen Sürü İşbirliği     :         rd2, 2026-01-01, 2026-06-01
-    Gelişmiş Mesh Networking     :         rd3, 2026-06-01, 2026-12-01
-    section Faz 3: Tam Otonomi (2027)
-    AI-Driven Orchestration      :         rd4, 2027-01-01, 2027-12-01
-    Kendi Kendini İyileştiren Sürü:        rd5, 2027-06-01, 2027-12-31
+flowchart LR
+    subgraph S1["Faz 1: Hazırlık & Ar-Ge"]
+        A["Mimari & Matematiksel Modelleme"] --> B["Sürü Çekirdek Algoritmaları"]
+    end
+    subgraph S2["Faz 2: Teknofest 2025"]
+        C["Gazebo & SITL Entegrasyonu"] --> D["Saha Testleri & Görev İcrası"]
+    end
+    subgraph S3["Faz 3: Swarm-to-Swarm (2026)"]
+        E["Heterojen Sürü İşbirliği"] --> F["Dinamik Ad-Hoc Mesh Ağı"]
+    end
+    subgraph S4["Faz 4: Tam Otonomi (2027)"]
+        G["Kendi Kendini İyileştiren Sürü & Uç Zeka"]
+    end
+    B --> C
+    D --> E
+    F --> G
 ```
 
 ---
@@ -224,7 +226,7 @@ gantt
 - **Simülasyon**: Gazebo Garden / Classic
 - **Uçuş Kontrol**: PX4 Autopilot / ArduPilot
 - **Konteynerizasyon**: Docker & Docker Compose
-- **Dil**: Python 3.10+, C++17
+- **Test ve Kalite**: Pytest (19 Birim Testi), Flake8 Linting
 
 ---
 
@@ -244,43 +246,63 @@ cd teknofest_suru_iha
 docker-compose up --build
 ```
 
-### 🔧 Manuel Kurulum
-Yerel dağıtım için gerekli bağımlılıklar:
-1. **ROS 2 Humble** yükleyin.
-2. **Gazebo Simulator** yükleyin.
-3. Python bağımlılıklarını yükleyin: `pip install -r requirements.txt`
-
+### 🔧 Manuel Kurulum (Yerel ROS 2)
+Gerekli Python ve ROS bağımlılıklarını yükleyin:
 ```bash
-# Çalışma alanını derleyin
+# Python bağımlılıklarını kurun
+pip install -r requirements.txt
+
+# ROS 2 çalışma alanını derleyin
 colcon build --symlink-install
 
 # Ortamı kaynak gösterin
 source install/setup.bash
 
-# Sürü Düğümünü başlatın
-ros2 launch swarm_simulation swarm_world.launch.py
+# Sürü Komuta filosunu başlatın
+ros2 launch swarm_core swarm.launch.py num_drones:=5 formation_type:=V_SHAPE mission_mode:=BOIDS
 ```
-
-### 🖥️ Headless Simülasyon (Sunucu Tipi)
-Grafik arayüzü olmayan sunucularda veya CI hatlarında çalıştırmak için:
-```bash
-ros2 launch swarm_simulation swarm_world.launch.py gui:=false
-```
-
-### 📊 Görev Analizi (Post-Mission Analysis)
-Görev sırasında toplanan verileri analiz etmek için:
-```bash
-python3 src/swarm_core/swarm_core/analyze_mission.py <log_dosyasi>.json
-```
-*Bu araç, toplam kat edilen mesafe, ortalama hız ve sürü yoğunluğu gibi kritik verileri sağlar.*
 
 ### 🛰️ Görev Modları (Mission Modes)
-Sürü, farklı görev profilleri arasında dinamik olarak geçiş yapabilir:
-- **BOIDS**: Ayrılma, Hizalanma ve Birleşme bazlı sürü koordinasyonu.
-- **SEARCH**: Arama-Kurtarma görevleri için Arşimet Spirali tabanlı alan tarama.
+Sürü, 5 farklı operasyonel mod arasında dinamik olarak geçiş yapabilir:
 
-*Mod değiştirmek için ROS 2 parametresini kullanın:*
-`ros2 param set /commander mission_mode SEARCH`
+1. **`BOIDS`**: Reynolds Flocking (Ayrılma, Hizalanma, Birleşme ve Hedef Çekimi).
+2. **`FORMATION`**: Lider-Takipçi formasyon uçuşu. Desteklenen geometriler:
+   - `V_SHAPE` (V Formasyonu)
+   - `LINE` (Yan Yana Hat Formasyonu)
+   - `COLUMN` (Arka Arkaya Kolon Formasyonu)
+   - `CIRCLE` (Çevre Koruma Çemberi)
+   - `GRID` (2D Matris Formasyonu)
+3. **`SEARCH`**: Arama-Kurtarma için Arşimet Spirali (`SPIRAL`) veya Lawnmower (`LAWNMOWER`) taraması.
+4. **`APF`**: LiDAR ve mesafe sensörü destekli Yapay Potansiyel Alanı ile engel sakınımı.
+5. **`RTL`**: İletişim kopmasında veya düşük bataryada otonom üsse dönüş (Fail-Safe).
+
+*Çalışma anında görev modu değiştirme:*
+```bash
+ros2 param set /drone_1/swarm_commander_1 mission_mode FORMATION
+ros2 param set /drone_1/swarm_commander_1 formation_type V_SHAPE
+```
+
+### 🖥️ Canlı Telemetri Paneli (Command Dashboard)
+Sürüdeki tüm İHA'ların anlık konumlarını, kütle merkezini, dağılım yarıçapını ve güvenlik durumunu izlemek için:
+```bash
+ros2 run swarm_core dashboard
+```
+
+### 📊 Görev Sonrası Analiz & Raporlama (Post-Mission Analysis)
+Görev sırasında kaydedilen JSON telemetri verisini analiz edip profesyonel Markdown veya JSON raporu üretin:
+```bash
+python3 src/swarm_core/swarm_core/analyze_mission.py mission_log_drone_1_*.json \
+    --report gorev_raporu.md \
+    --export-summary ozet.json
+```
+
+---
+
+## 🧪 Birim Testleri & Kalite Güvencesi
+Algoritmalar ve komuta mantığı 19 kapsamlı birim testi ile doğrulanmaktadır:
+```bash
+pytest -v
+```
 
 ---
 
@@ -308,9 +330,8 @@ Kovan her zaman genişliyor. **Kolektif Zeka**ya katkıda bulunmak istiyorsanız
 
 <div align="center">
 
-*"Bütün, parçaların toplamından daha büyüktür."*
+*"Bütün, parçaların toplamından daha büyüktür."*  
 **© 2025 Teknofest Sürü İHA Takımı. Tüm Sistemler Çevrimiçi.**
-
 
 </div>
 <p align="center">
