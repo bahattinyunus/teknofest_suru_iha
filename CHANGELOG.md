@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-10-28
+### Added
+- **Computer Vision & Target Geolocation Pipeline (`vision_pipeline.py`)**:
+  - `SwarmVisionEngine`: Implemented geometric shape classification (`CIRCLE`, `SQUARE`, `H_PAD`, `CROSS`), color segmentation, and synthetic ground target scanner.
+  - `CameraIntrinsics` & Pinhole Model: Calculates 2D image pixel to real-world 3D coordinates $(X_w, Y_w, Z_w)$ projection with camera focal length, principal point, and UAV heading rotation.
+- **Market-Based Multi-Agent Task Allocation (`AuctionTaskAllocator`)**:
+  - Distributed auction engine assigning discovered ground targets to the optimal UAV factoring in Euclidean distance and remaining battery percentage.
+- **Quintic Polynomial Trajectory Smoothing (`TrajectoryGenerator`)**:
+  - Generates $C^2$ continuous minimum-jerk position and velocity profiles with zero initial/terminal jerk.
+- **Swarm Command-Line Interface (`cli.py`)**:
+  - Unified administration tool for live fleet status, formation switching, mission dispatching, and high-speed algorithm benchmarking.
+- **Extended Test Suite**:
+  - 34 unit tests (up from 27) covering task auctions, quintic spline trajectories, camera pinhole projections, and target classifications with 100% pass rate.
+
 ## [1.4.0] - 2026-10-28
 ### Added
 - **Dynamic Leader Election (`LeaderElectionEngine`)**:

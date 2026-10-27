@@ -29,6 +29,7 @@ setup(
             'analyze = swarm_core.analyze_mission:main',
             'referee = swarm_core.referee_bridge:main',
             'web_gcs = swarm_core.web_gcs:main',
+            'cli = swarm_core.cli:main',
         ],
     },
 )

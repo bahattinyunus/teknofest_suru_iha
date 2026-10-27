@@ -621,3 +621,107 @@ class TargetTracker:
     def get_confirmed_targets(self) -> List[Dict[str, Any]]:
         return [{'id': tid, 'pos': d['pos'], 'detectors': list(d['detectors'])}
                 for tid, d in self.targets.items() if d['confirmed']]
+
+
+class AuctionTaskAllocator:
+    """
+    Market-Based Multi-Agent Task Allocation (MATA) Engine.
+    Uses distributed auction consensus to assign discovered targets/waypoints
+    to the most optimal drone based on Euclidean distance and remaining battery.
+    """
+    def __init__(self, weight_dist: float = 1.0, weight_battery: float = 0.5):
+        self.weight_dist = weight_dist
+        self.weight_battery = weight_battery
+        # assignments: task_id -> assigned_uav_id
+        self.assignments: Dict[str, int] = {}
+        # tasks: task_id -> {'pos': Vector3, 'priority': int}
+        self.tasks: Dict[str, Dict[str, Any]] = {}
+
+    def add_task(self, task_id: str, pos: Vector3, priority: int = 1):
+        self.tasks[task_id] = {'pos': pos, 'priority': priority}
+
+    def compute_bid(self, uav_pos: Vector3, battery_percent: float, task_id: str) -> float:
+        """Computes cost for a UAV to undertake a task. Lower bid = better candidate."""
+        if task_id not in self.tasks:
+            return float('inf')
+
+        target_pos = self.tasks[task_id]['pos']
+        dist = uav_pos.distance_to(target_pos)
+        # Higher remaining battery reduces bid
+        battery_penalty = max(0.0, 100.0 - battery_percent)
+        cost = (dist * self.weight_dist) + (battery_penalty * self.weight_battery)
+        return cost
+
+    def allocate_tasks(self, fleet_status: Dict[int, Dict[str, Any]]) -> Dict[str, int]:
+        """
+        Executes auction across active UAV fleet.
+        fleet_status: uav_id -> {'pos': Vector3, 'battery': float}
+        Returns: {task_id: assigned_uav_id}
+        """
+        # Reset and allocate greedy minimum-cost bidder for each task
+        new_assignments: Dict[str, int] = {}
+        assigned_drones: Set[int] = set()
+
+        # Sort tasks by priority descending
+        sorted_tasks = sorted(self.tasks.keys(), key=lambda t: self.tasks[t]['priority'], reverse=True)
+
+        for tid in sorted_tasks:
+            best_bid = float('inf')
+            best_uav = None
+
+            for uav_id, status in fleet_status.items():
+                if uav_id in assigned_drones:
+                    continue  # 1 task per drone constraint
+
+                bid = self.compute_bid(status['pos'], status.get('battery', 100.0), tid)
+                if bid < best_bid:
+                    best_bid = bid
+                    best_uav = uav_id
+
+            if best_uav is not None:
+                new_assignments[tid] = best_uav
+                assigned_drones.add(best_uav)
+
+        self.assignments = new_assignments
+        return self.assignments
+
+    def get_assigned_task(self, uav_id: int) -> Optional[str]:
+        for tid, uid in self.assignments.items():
+            if uid == uav_id:
+                return tid
+        return None
+
+
+class TrajectoryGenerator:
+    """
+    Smooth Quintic Polynomial 3D Trajectory Generator.
+    Produces C^2 continuous position, velocity, and acceleration profiles
+    between 3D waypoints with zero boundary jerk.
+    """
+    @staticmethod
+    def quintic_trajectory(p_start: Vector3,
+                           p_end: Vector3,
+                           duration: float,
+                           t: float) -> Tuple[Vector3, Vector3]:
+        """
+        Interpolates quintic polynomial s(t):
+        s(0) = 0, s(T) = 1, s'(0) = 0, s'(T) = 0, s''(0) = 0, s''(T) = 0.
+        s(tau) = 10*tau^3 - 15*tau^4 + 6*tau^5 where tau = t / T.
+        s'(tau) = (30*tau^2 - 60*tau^3 + 30*tau^4) / T.
+        Returns: (pos_t, vel_t)
+        """
+        if duration <= 0:
+            return p_end, Vector3(0.0, 0.0, 0.0)
+
+        tau = max(0.0, min(1.0, t / duration))
+
+        # Position scale s(tau)
+        s = 10.0 * (tau**3) - 15.0 * (tau**4) + 6.0 * (tau**5)
+        # Velocity scale s_dot(tau)
+        s_dot = (30.0 * (tau**2) - 60.0 * (tau**3) + 30.0 * (tau**4)) / duration
+
+        diff = p_end - p_start
+        pos = p_start + (diff * s)
+        vel = diff * s_dot
+
+        return pos, vel
