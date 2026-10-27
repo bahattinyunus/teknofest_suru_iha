@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-10-28
+### Added & Improved
+- **Futuristic Hero Banner**: Designed and integrated a high-resolution, cinematic 16:9 aerospace banner depicting an autonomous multi-UAV swarm in V-formation with glowing cyan mesh network telemetry lines and HUD overlays.
+- **Repository Branding**: Modernized `README.md` hero presentation with full-width responsive header and TEKNOFEST competition slogan *"Gökyüzünde Takım Oyunu"*.
+
 ## [1.3.0] - 2026-10-28
 ### Added
 - **Core Algorithmic Engines (`swarm_core/algorithms.py`)**:

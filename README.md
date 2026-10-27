@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🚁 TEKNOFEST SÜRÜ ZEKASI KOMUTA MERKEZİ
-### Sürü İHA (Swarm UAV) Yarışması 2025
+<img src="visionary_swarm_banner.png" alt="TEKNOFEST Sürü İHA Komuta Merkezi" width="100%">
 
-![Sürü Komuta Merkezi](visionary_swarm_banner.png)
+# 🚁 TEKNOFEST SÜRÜ ZEKASI KOMUTA MERKEZİ
+### Sürü İHA (Swarm UAV) • "Gökyüzünde Takım Oyunu"
 
 [![Lisans](https://img.shields.io/badge/LISANS-MIT-00E5FF?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
-[![Sürüm](https://img.shields.io/badge/SURUM-v1.3.0-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
+[![Sürüm](https://img.shields.io/badge/SURUM-v1.3.1-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
 [![Testler](https://img.shields.io/badge/TESTLER-19%20GECTI-00E5FF?style=for-the-badge&logo=pytest&logoColor=white)](.github/workflows/ci.yml)
 [![Durum](https://img.shields.io/badge/SISTEM-OPERASYONEL-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://github.com/bahattinyunus/teknofest_suru_iha)
 [![Çerçeve](https://img.shields.io/badge/CEKIRDEK-ROS2_HUMBLE-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://docs.ros.org/en/humble/)
