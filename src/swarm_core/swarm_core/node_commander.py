@@ -33,6 +33,7 @@ from swarm_core.algorithms import (
     GeofenceManager,
     TargetTracker
 )
+from swarm_core.precision_engagement import PrecisionEngagementController
 
 
 class SwarmCommander(Node):
@@ -65,9 +66,11 @@ class SwarmCommander(Node):
         self.declare_parameter('failsafe_enabled', True)
         self.declare_parameter('enable_dynamic_election', True)
         self.declare_parameter('enable_geofence', True)
+        self.declare_parameter('uav_role', 'STANDARD')  # SCOUT, RELAY, INTERCEPTOR, STANDARD
 
         self.swarm_id = self.get_parameter('swarm_id').value
         self.leader_id = self.get_parameter('leader_id').value
+        self.uav_role = self.get_parameter('uav_role').value
 
         # Initialize Algorithmic Controllers
         self.boids = BoidsController(
@@ -116,6 +119,11 @@ class SwarmCommander(Node):
         )
 
         self.target_tracker = TargetTracker()
+        self.engagement_controller = PrecisionEngagementController(
+            cruise_alt=self.get_parameter('target_z').value,
+            drop_alt=2.0,
+            approach_speed=self.get_parameter('max_speed').value * 0.8
+        )
 
         # Internal State
         self.current_state = State()
@@ -437,6 +445,11 @@ class SwarmCommander(Node):
             cmd_vec = self.calculate_search_cmd()
         elif mode == 'APF':
             cmd_vec = self.calculate_apf_cmd()
+        elif mode == 'ENGAGE':
+            cmd_vec, eng_state, is_done = self.engagement_controller.update(curr_pos, time.time())
+            if is_done:
+                self.get_logger().info("Hedef Görevi Tamamlandı, Formasyona Dönülüyor...")
+                mode = 'FORMATION'
         elif mode == 'RTL':
             cmd_vec = self.calculate_rtl_cmd()
         else:
@@ -469,6 +482,7 @@ class SwarmCommander(Node):
                 record = {
                     "timestamp": now.to_msg().sec,
                     "drone_id": self.swarm_id,
+                    "uav_role": self.uav_role,
                     "mode": mode,
                     "pose": {
                         "x": self.current_pose.pose.position.x,

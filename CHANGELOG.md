@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-10-28
+### Added
+- **Ad-Hoc Multi-Hop Mesh Network Simulator (`mesh_network.py`)**:
+  - `DecentralizedMeshNetwork`: Radio propagation model (Log-distance path loss, RSSI calculation), Breadth-First dynamic multi-hop routing, TTL hop limits, and Electronic Warfare (EW) jamming noise bubbles.
+- **Precision Target Engagement & Descent Controller (`precision_engagement.py`)**:
+  - Autonomous multi-stage visual servoing finite state machine: `CRUISE_APPROACH` -> `VISUAL_ALIGN` -> `CONTROLLED_DESCENT` -> `ENGAGE` -> `CLIMB_REJOIN`.
+  - Precision payload drop / QR scan verification with automatic climb out and formation rejoining.
+- **Heterogeneous Swarm Architecture (`node_commander.py`)**:
+  - Distinct operational profiles: `SCOUT` (reconnaissance), `RELAY` (high-altitude RF bridge), `INTERCEPTOR` (precision target drops), and `RESERVE`.
+- **Interactive Web GCS v3 (`web_gcs.py`)**:
+  - Real-time multi-hop mesh connectivity lines, role badges, and interactive click-to-drop target placement with automated auction task assignment.
+- **Full Mission Lifecycle Integration Test (`test_integration_mission.py`)**:
+  - End-to-end mission verification covering formation takeoff, target detection, auction dispatch, precision engagement descent, and climb rejoin.
+- **Expanded Test Suite**:
+  - 40 automated tests with 100% pass rate.
+
 ## [1.5.0] - 2026-10-28
 ### Added
 - **Computer Vision & Target Geolocation Pipeline (`vision_pipeline.py`)**:

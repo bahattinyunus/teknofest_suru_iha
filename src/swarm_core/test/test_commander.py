@@ -50,6 +50,12 @@ class TestSwarmCommander(unittest.TestCase):
         cmd_follower = self.node.calculate_formation_cmd()
         self.assertIsInstance(cmd_follower, Vector3)
 
+    def test_heterogeneous_role_assignment(self):
+        """Test heterogeneous UAV role configuration."""
+        self.assertEqual(self.node.uav_role, 'STANDARD')
+        self.assertIsNotNone(self.node.engagement_controller)
+        self.assertEqual(self.node.engagement_controller.current_state, 'IDLE')
+
 
 if __name__ == '__main__':
     unittest.main()
