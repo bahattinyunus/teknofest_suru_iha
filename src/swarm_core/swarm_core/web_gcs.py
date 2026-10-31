@@ -19,6 +19,19 @@ SWARM_STATE = {
     "formation_type": "V_SHAPE",
     "leader_id": 1,
     "geofence": {"xmin": -50.0, "xmax": 50.0, "ymin": -50.0, "ymax": 50.0, "zmax": 30.0},
+    "referee": {
+        "score": 1150.0,
+        "base_score": 1000.0,
+        "penalties": 0.0,
+        "bonuses": 150.0,
+        "status": "OPERASYONEL / KURAL İHLALİ YOK"
+    },
+    "sensor_fusion": {
+        "mode": "EKF_ACTIVE",
+        "gnss_status": "3D_FIX_OK",
+        "uncertainty_1sigma": 0.28
+    },
+    "collision_avoidance": "RVO_3D_ENABLED",
     "drones": {
         "1": {"x": 0.0, "y": 0.0, "z": 12.0, "vx": 0.0, "vy": 0.0, "battery": 96.0, "role": "LEADER / RELAY", "time": time.time()},
         "2": {"x": 10.0, "y": 8.0, "z": 10.0, "vx": 0.0, "vy": 0.0, "battery": 94.5, "role": "SCOUT", "time": time.time()},
@@ -103,6 +116,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     <header>
         <h1>🚁 TEKNOFEST SÜRÜ ZEKASI KOMUTA MERKEZİ</h1>
         <div style="display:flex; gap:12px; align-items:center;">
+            <span class="status-badge" id="referee-badge" style="border-color:var(--accent-green); color:var(--accent-green);">🏆 PUAN: 1150 PTS</span>
+            <span class="status-badge" id="fusion-badge" style="border-color:var(--accent-cyan); color:var(--accent-cyan);">🛰️ EKF: 3D FIX (0.28m σ)</span>
+            <span class="status-badge" id="rvo-badge" style="border-color:#bb86fc; color:#bb86fc;">⚡ RVO-3D: AKTİF</span>
             <span class="status-badge" id="mode-badge">MOD: FORMATION</span>
             <span class="status-badge" id="leader-badge" style="border-color:var(--accent-gold); color:var(--accent-gold);">LİDER: UAV-1</span>
         </div>
@@ -275,6 +291,13 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
                 document.getElementById('mode-badge').innerText = `MOD: ${data.mission_mode} (${data.formation_type})`;
                 document.getElementById('leader-badge').innerText = `LİDER: UAV-${data.leader_id}`;
+
+                if (data.referee) {
+                    document.getElementById('referee-badge').innerText = `🏆 PUAN: ${data.referee.score} PTS`;
+                }
+                if (data.sensor_fusion) {
+                    document.getElementById('fusion-badge').innerText = `🛰️ EKF: ${data.sensor_fusion.gnss_status} (${data.sensor_fusion.uncertainty_1sigma}m σ)`;
+                }
 
                 // Update drone list
                 const list = document.getElementById('droneList');

@@ -6,8 +6,8 @@
 ### Sürü İHA (Swarm UAV) • "Gökyüzünde Takım Oyunu"
 
 [![Lisans](https://img.shields.io/badge/LISANS-MIT-00E5FF?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
-[![Sürüm](https://img.shields.io/badge/SURUM-v1.6.0-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
-[![Testler](https://img.shields.io/badge/TESTLER-40%20GECTI-00E5FF?style=for-the-badge&logo=pytest&logoColor=white)](.github/workflows/ci.yml)
+[![Sürüm](https://img.shields.io/badge/SURUM-v1.7.0-00E5FF?style=for-the-badge&logo=git&logoColor=white)](CHANGELOG.md)
+[![Testler](https://img.shields.io/badge/TESTLER-51%20GECTI-00E5FF?style=for-the-badge&logo=pytest&logoColor=white)](.github/workflows/ci.yml)
 [![Durum](https://img.shields.io/badge/SISTEM-OPERASYONEL-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://github.com/bahattinyunus/teknofest_suru_iha)
 [![Çerçeve](https://img.shields.io/badge/CEKIRDEK-ROS2_HUMBLE-00E5FF?style=for-the-badge&logo=ros&logoColor=white)](https://docs.ros.org/en/humble/)
 [![Simülasyon](https://img.shields.io/badge/SIM-GAZEBO-00E5FF?style=for-the-badge&logo=gazebo&logoColor=white)](https://gazebosim.org/)
@@ -186,18 +186,20 @@ graph TD
 | Modül | Dosya / Dizin | Protokol / Görev | Durum |
 | :--- | :--- | :--- | :--- |
 | **Algoritmik Motor** | `swarm_core/algorithms.py` | Boids, Formasyon, APF, SAR, IDS, Lider Seçimi, MATA & Yörünge | 🟢 **AKTİF** |
+| **Sensör Füzyonu & EKF** | `swarm_core/sensor_fusion.py` | 9-Durumlu Genişletilmiş Kalman Filtresi, GNSS-Denied Ölü Seyir & UWB Füzyon | 🟢 **AKTİF** |
+| **RVO Çarpışma Önleme** | `swarm_core/rvo_avoidance.py` | 3D Reciprocal Velocity Obstacle (RVO) Titreşimsiz Karşılıklı Kaçınma | 🟢 **AKTİF** |
 | **Ad-Hoc Mesh Ağı** | `swarm_core/mesh_network.py` | RF Yayılımı (RSSI), Çok Atlamalı Yönlendirme & EW Karıştırma | 🟢 **AKTİF** |
 | **Hassas Müdahale** | `swarm_core/precision_engagement.py` | Hedef Yaklaşımı, Dikey İniş, Yük Bırakma & Tekrar Katılım | 🟢 **AKTİF** |
 | **Görsel Algılama (CV)** | `swarm_core/vision_pipeline.py` | Pinhole Kamera Projeksiyonu, QR & Hedef Jeolokasyonu | 🟢 **AKTİF** |
 | **Komuta Düğümü** | `swarm_core/node_commander.py` | Heterojen Sürü (Scout, Relay, Interceptor) Otonom Kontrol | 🟢 **AKTİF** |
-| **Sürü Yönetim CLI** | `swarm_core/cli.py` | Filo Durumu, Görev Değişimi & Mikro-Saniye Benchmark Aracı | 🟢 **AKTİF** |
-| **Web Yer İstasyonu (GCS)** | `swarm_core/web_gcs.py` | HTML5 Taktik Radar, Mesh İzleme & İnteraktif Hedef İhalesi | 🟢 **AKTİF** |
-| **Hakem Köprüsü** | `swarm_core/referee_bridge.py` | TEKNOFEST Hakem Sunucusu UDP/JSON Entegrasyonu | 🟢 **AKTİF** |
+| **Sürü Yönetim CLI** | `swarm_core/cli.py` | Filo Durumu, Görev Değişimi, Hakem Skor Simülasyonu & Benchmark | 🟢 **AKTİF** |
+| **Web Yer İstasyonu (GCS)** | `swarm_core/web_gcs.py` | HTML5 Taktik Radar, EKF Durumu, Canlı Hakem Skoru & Hedef İhalesi | 🟢 **AKTİF** |
+| **Hakem Köprüsü & Skor** | `swarm_core/referee_bridge.py` | TEKNOFEST Hakem UDP Köprüsü & Otomatik Görev Puanlama Motoru | 🟢 **AKTİF** |
 | **Canlı Telemetri** | `swarm_core/dashboard.py` | Terminal Tabanlı Kütle Merkezi & Dağılım İzleme | 🟢 **AKTİF** |
 | **Görev Analizi** | `swarm_core/analyze_mission.py` | Post-Process KPI, Markdown & JSON Raporlama | 🟢 **AKTİF** |
 | **Hızlı SITL Simülatörü** | `swarm_simulation/mock_sitl_bridge.py` | Hafif 6-DoF Kinematik & LiDAR Işın Simülasyonu | 🟢 **AKTİF** |
 | **3D Yarışma Arenası** | `swarm_simulation/worlds/` | Gazebo Teknofest Engel & Kule Parkuru Dünyası | 🟢 **AKTİF** |
-| **Sürekli Entegrasyon** | `.github/workflows/` | Pytest (40/40 Test) & ROS 2 Humble CI | 🟢 **AKTİF** |
+| **Sürekli Entegrasyon** | `.github/workflows/` | Pytest (51/51 Test) & ROS 2 Humble CI | 🟢 **AKTİF** |
 
 ---
 
@@ -325,7 +327,7 @@ python3 src/swarm_core/swarm_core/analyze_mission.py mission_log_drone_1_*.json 
     --export-summary ozet.json
 ```
 
-### 💻 Sürü Yönetim CLI & Hız Testi (Swarm CLI)
+### 💻 Sürü Yönetim CLI, Hakem Puanlama & Hız Testi (Swarm CLI)
 Sürüyü komut satırından yönetmek, formasyonları değiştirmek ve gerçek zamanlı işlem hızını test etmek için:
 ```bash
 # Filo ve lider durumunu görüntüleyin
@@ -335,14 +337,17 @@ ros2 run swarm_core cli status
 ros2 run swarm_core cli formation V_SHAPE
 ros2 run swarm_core cli mission SEARCH
 
-# Algoritmik performans testi (Boids, Görev Dağıtımı, Geofence)
+# TEKNOFEST hakem puanlama simülasyonunu çalıştırın
+ros2 run swarm_core cli score-eval
+
+# Algoritmik performans testi (Boids, RVO-3D, EKF, Görev Dağıtımı, Geofence)
 ros2 run swarm_core cli benchmark
 ```
 
 ---
 
 ## 🧪 Birim Testleri & Kalite Güvencesi
-Sürü algoritmaları, ad-hoc mesh ağı, hassas hedef müdahalesi, lider seçimi, MATA görev dağıtımı, pinhole kamera projeksiyonu, geofence, hakem köprüsü ve fizik dinamikleri 40 kapsamlı birim testi ile doğrulanmaktadır:
+Sürü algoritmaları, 9-durumlu EKF sensör füzyonu, RVO-3D çarpışma önleme, ad-hoc mesh ağı, hassas hedef müdahalesi, lider seçimi, MATA görev dağıtımı, pinhole kamera projeksiyonu, geofence, hakem skorlama ve fizik dinamikleri 51 kapsamlı birim testi ile doğrulanmaktadır:
 ```bash
 pytest -v
 ```

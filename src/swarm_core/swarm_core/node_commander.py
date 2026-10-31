@@ -34,6 +34,8 @@ from swarm_core.algorithms import (
     TargetTracker
 )
 from swarm_core.precision_engagement import PrecisionEngagementController
+from swarm_core.sensor_fusion import SensorFusionEKF
+from swarm_core.rvo_avoidance import RVOCollisionAvoidance
 
 
 class SwarmCommander(Node):
@@ -67,6 +69,8 @@ class SwarmCommander(Node):
         self.declare_parameter('enable_dynamic_election', True)
         self.declare_parameter('enable_geofence', True)
         self.declare_parameter('uav_role', 'STANDARD')  # SCOUT, RELAY, INTERCEPTOR, STANDARD
+        self.declare_parameter('avoidance_mode', 'RVO')  # RVO, APF
+        self.declare_parameter('enable_sensor_fusion', True)
 
         self.swarm_id = self.get_parameter('swarm_id').value
         self.leader_id = self.get_parameter('leader_id').value
@@ -123,6 +127,17 @@ class SwarmCommander(Node):
             cruise_alt=self.get_parameter('target_z').value,
             drop_alt=2.0,
             approach_speed=self.get_parameter('max_speed').value * 0.8
+        )
+
+        self.rvo = RVOCollisionAvoidance(
+            drone_radius=self.get_parameter('safe_distance').value * 0.4,
+            time_horizon=3.0,
+            max_speed=self.get_parameter('max_speed').value
+        )
+
+        self.sensor_fusion = SensorFusionEKF(
+            initial_pos=Vector3(0.0, 0.0, 0.0),
+            initial_vel=Vector3(0.0, 0.0, 0.0)
         )
 
         # Internal State
@@ -213,6 +228,12 @@ class SwarmCommander(Node):
 
         self.current_pose = msg
         self.prev_pose_time = now_sec
+
+        # Update Sensor Fusion EKF
+        if self.get_parameter('enable_sensor_fusion').value:
+            self.sensor_fusion.update_gps(
+                Vector3(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
+            )
 
         if not self.home_set and msg.pose.position.z > 0.5:
             self.home_pos = Vector3(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
@@ -455,8 +476,17 @@ class SwarmCommander(Node):
         else:
             cmd_vec = self.calculate_boids_cmd()
 
-        # Add obstacle avoidance repulsive force (except for APF which does it internally)
-        if mode != 'APF':
+        # Multi-agent Collision Avoidance (RVO vs APF)
+        avoidance_mode = self.get_parameter('avoidance_mode').value
+        if avoidance_mode == 'RVO' and self.neighbors:
+            neighbor_states = [(data['pos'], data['vel']) for data in self.neighbors.values()]
+            cmd_vec = self.rvo.compute_avoidance_velocity(
+                pos_self=curr_pos,
+                vel_current=self.current_vel,
+                vel_preferred=cmd_vec,
+                neighbors=neighbor_states
+            )
+        elif mode != 'APF':
             obs_force = self.calculate_obstacle_avoidance()
             cmd_vec = cmd_vec + obs_force
 
@@ -498,7 +528,9 @@ class SwarmCommander(Node):
                     "active_leader_id": self.leader_id,
                     "geofence_inside": self.geofence.is_inside(curr_pos),
                     "anomalous_nodes": list(self.anomaly_detector.flagged_nodes),
-                    "failsafe_status": self.failsafe.current_state
+                    "failsafe_status": self.failsafe.current_state,
+                    "fusion_uncertainty": round(self.sensor_fusion.get_position_uncertainty(), 3) if self.get_parameter('enable_sensor_fusion').value else 0.0,
+                    "gnss_healthy": self.sensor_fusion.is_navigation_healthy() if self.get_parameter('enable_sensor_fusion').value else True
                 }
                 self.mission_data.append(record)
                 self.last_log_time = now

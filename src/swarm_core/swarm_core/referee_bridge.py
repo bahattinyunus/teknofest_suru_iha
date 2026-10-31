@@ -9,7 +9,7 @@ import json
 import socket
 import time
 import threading
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Tuple
 
 try:
     import rclpy
@@ -69,6 +69,176 @@ def create_target_detection_packet(team_id: int,
         "tespit_zamani": time.time(),
         "dogruluk_orani": round(float(confidence), 2)
     }
+
+
+class TeknofestScoringEvaluator:
+    """
+    TEKNOFEST Sürü İHA Görev Puanlama ve Kural Değerlendirme Motoru.
+    Computes real-time competition scores, safety violation penalties,
+    multi-agent target consensus bonuses, and precision payload engagement accuracy.
+    """
+
+    def __init__(self,
+                 base_score: float = 1000.0,
+                 geofence_penalty_per_sec: float = 15.0,
+                 proximity_violation_penalty: float = 50.0,
+                 safe_distance_threshold: float = 1.5,
+                 target_detect_points: float = 150.0,
+                 target_consensus_bonus: float = 100.0,
+                 consensus_window_sec: float = 30.0):
+        self.base_score = float(base_score)
+        self.geofence_penalty_per_sec = float(geofence_penalty_per_sec)
+        self.proximity_violation_penalty = float(proximity_violation_penalty)
+        self.safe_distance_threshold = float(safe_distance_threshold)
+        self.target_detect_points = float(target_detect_points)
+        self.target_consensus_bonus = float(target_consensus_bonus)
+        self.consensus_window_sec = float(consensus_window_sec)
+
+        # Records
+        self.geofence_violations: List[Dict[str, Any]] = []
+        self.proximity_violations: List[Dict[str, Any]] = []
+        self.target_detections: Dict[str, List[Dict[str, Any]]] = {}
+        self.precision_engagements: List[Dict[str, Any]] = []
+        self.penalties_total = 0.0
+        self.bonuses_total = 0.0
+
+    def record_geofence_breach(self, uav_id: int, duration_sec: float) -> float:
+        """Records breach of outer boundary and deducts points."""
+        penalty = duration_sec * self.geofence_penalty_per_sec
+        self.geofence_violations.append({
+            "uav_id": uav_id,
+            "duration_sec": duration_sec,
+            "penalty": penalty,
+            "timestamp": time.time()
+        })
+        self.penalties_total += penalty
+        return penalty
+
+    def record_proximity_violation(self, uav_1: int, uav_2: int, distance: float) -> Optional[float]:
+        """Records near-collision or unsafe separation between two swarm members."""
+        if distance < self.safe_distance_threshold:
+            penalty = self.proximity_violation_penalty
+            self.proximity_violations.append({
+                "uav_pair": (min(uav_1, uav_2), max(uav_1, uav_2)),
+                "distance": distance,
+                "penalty": penalty,
+                "timestamp": time.time()
+            })
+            self.penalties_total += penalty
+            return penalty
+        return None
+
+    def record_target_detection(self,
+                                target_id: str,
+                                uav_id: int,
+                                confidence: float = 0.95,
+                                timestamp: Optional[float] = None) -> float:
+        """
+        Records target identification by a drone.
+        Awards detection points and triggers consensus bonus if verified by another UAV.
+        """
+        ts = timestamp if timestamp is not None else time.time()
+        award = 0.0
+
+        if target_id not in self.target_detections:
+            self.target_detections[target_id] = []
+            # First detection award
+            award += self.target_detect_points
+        
+        # Check if this UAV already detected this target
+        already_detected_by_this = any(d["uav_id"] == uav_id for d in self.target_detections[target_id])
+        if not already_detected_by_this:
+            # Check for consensus within time window
+            consensus_qualified = False
+            for prev in self.target_detections[target_id]:
+                if abs(ts - prev["timestamp"]) <= self.consensus_window_sec and prev["uav_id"] != uav_id:
+                    consensus_qualified = True
+                    break
+
+            if consensus_qualified and len(self.target_detections[target_id]) == 1:
+                award += self.target_consensus_bonus
+
+            self.target_detections[target_id].append({
+                "uav_id": uav_id,
+                "confidence": confidence,
+                "timestamp": ts
+            })
+
+        self.bonuses_total += award
+        return award
+
+    def record_precision_engagement(self,
+                                   target_id: str,
+                                   uav_id: int,
+                                   miss_distance: float) -> float:
+        """
+        Grades payload release precision based on radial miss distance:
+        <= 0.5m: +250 pts (Bulls-eye)
+        <= 1.5m: +150 pts (Close impact)
+        <= 3.0m: +50 pts (Acceptable impact)
+        > 3.0m: 0 pts
+        """
+        if miss_distance <= 0.5:
+            points = 250.0
+            grade = "TAM_ISABET"
+        elif miss_distance <= 1.5:
+            points = 150.0
+            grade = "YAKIN_ISABET"
+        elif miss_distance <= 3.0:
+            points = 50.0
+            grade = "GECERLI_ISABET"
+        else:
+            points = 0.0
+            grade = "ISAKAT"
+
+        self.precision_engagements.append({
+            "target_id": target_id,
+            "uav_id": uav_id,
+            "miss_distance": round(miss_distance, 2),
+            "points": points,
+            "grade": grade,
+            "timestamp": time.time()
+        })
+        self.bonuses_total += points
+        return points
+
+    def evaluate_mission_score(self,
+                               elapsed_time: float,
+                               max_mission_time: float = 600.0) -> Dict[str, Any]:
+        """Computes comprehensive mission score summary."""
+        time_bonus = 0.0
+        if elapsed_time < max_mission_time:
+            time_bonus = max(0.0, round((max_mission_time - elapsed_time) * 0.5, 1))
+
+        final_score = max(0.0, round(self.base_score + self.bonuses_total + time_bonus - self.penalties_total, 1))
+
+        return {
+            "final_score": final_score,
+            "base_score": self.base_score,
+            "bonuses_total": round(self.bonuses_total, 1),
+            "time_bonus": time_bonus,
+            "penalties_total": round(self.penalties_total, 1),
+            "targets_detected_count": len(self.target_detections),
+            "engagements_count": len(self.precision_engagements),
+            "geofence_violations_count": len(self.geofence_violations),
+            "proximity_violations_count": len(self.proximity_violations),
+            "mission_status": "BASARILI" if final_score >= 1000.0 else "GECERLI"
+        }
+
+    def export_scorecard(self, filepath: str, elapsed_time: float = 300.0) -> None:
+        """Saves JSON scorecard report for TEKNOFEST jury submission."""
+        summary = self.evaluate_mission_score(elapsed_time)
+        report = {
+            "summary": summary,
+            "details": {
+                "geofence_violations": self.geofence_violations,
+                "proximity_violations": self.proximity_violations,
+                "target_detections": self.target_detections,
+                "precision_engagements": self.precision_engagements
+            }
+        }
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=4, ensure_ascii=False)
 
 
 class RefereeClient:
